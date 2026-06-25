@@ -29,7 +29,7 @@ body::after{
   content:"";
   position:fixed;
   inset:0;
-  z-index:-2;
+  z-index:0;
   opacity:.32;
   background-image:
     radial-gradient(#ffffff 0.7px, transparent 0.8px),
@@ -43,7 +43,7 @@ body::after{
   from{transform:translate3d(0,0,0)}
   to{transform:translate3d(-80px,40px,0)}
 }
-.wrap{width:min(1560px,94vw);margin:0 auto;padding:28px 0 48px}
+.wrap{width:min(1560px,94vw);margin:0 auto;padding:28px 0 48px;position:relative;z-index:2}
 .hero{display:flex;justify-content:center;gap:18px;align-items:center;margin:8px 0 22px;text-align:center}
 h1{font-size:clamp(34px,4.8vw,68px);line-height:1.08;margin:0;font-weight:900;letter-spacing:.025em;color:#ffffff;text-shadow:0 0 16px rgba(110,231,255,.40),0 0 34px rgba(168,85,247,.18)}
 .subtitle{margin:12px 0 0;color:var(--muted);font-size:16px}
@@ -80,7 +80,7 @@ td.num,th.num{text-align:right}
   100%{transform:translate3d(3%,2%,0) rotate(4deg) scale(1.05)}
 }
 
-  50%{opacity:.46;scale:1.04}
+  50%{opacity:.58;scale:1.04}
 }
 .panel,.kpi{
   backdrop-filter: blur(8px);
@@ -105,9 +105,9 @@ td.num,th.num{text-align:right}
 .nebula{
   position:fixed;
   inset:-20%;
-  z-index:-2;
+  z-index:0;
   pointer-events:none;
-  opacity:.48;
+  opacity:.62;
   background:
     conic-gradient(from 80deg at 42% 48%,
       transparent 0deg,
@@ -129,21 +129,29 @@ td.num,th.num{text-align:right}
   inset:0;
   pointer-events:none;
   overflow:hidden;
-  z-index:-1;
+  z-index:1;
 }
 .planet{
   position:absolute;
   display:block;
   border-radius:50%;
-  opacity:.62;
+  opacity:.78;
   filter:drop-shadow(0 0 28px rgba(110,231,255,.20));
   animation:planetFloat 24s ease-in-out infinite;
+}
+.planet::before{
+  content:"";
+  position:absolute;
+  inset:-35%;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(110,231,255,.18), transparent 62%);
+  z-index:-1;
 }
 .planet i{
   position:absolute;
   inset:-20%;
   border-radius:50%;
-  border:1px solid rgba(226,232,240,.26);
+  border:1px solid rgba(226,232,240,.30);
   transform:rotate(-18deg) scaleX(1.52);
 }
 .planet-a{
@@ -158,7 +166,7 @@ td.num,th.num{text-align:right}
   background:
     radial-gradient(circle at 30% 25%, rgba(255,255,255,.78), transparent 12%),
     radial-gradient(circle at 40% 40%, #fde68a 0%, #d97706 42%, #4c1d95 84%);
-  opacity:.48;
+  opacity:.62;
   animation-delay:-9s;
 }
 .planet-c{
@@ -166,7 +174,7 @@ td.num,th.num{text-align:right}
   background:
     radial-gradient(circle at 32% 28%, rgba(255,255,255,.88), transparent 14%),
     radial-gradient(circle at 42% 42%, #c4b5fd 0%, #7c3aed 46%, #111827 84%);
-  opacity:.44;
+  opacity:.60;
   animation-delay:-14s;
 }
 .planet-d{
@@ -174,7 +182,7 @@ td.num,th.num{text-align:right}
   background:
     radial-gradient(circle at 32% 28%, rgba(255,255,255,.82), transparent 14%),
     radial-gradient(circle at 42% 42%, #99f6e4 0%, #0f766e 46%, #020617 84%);
-  opacity:.46;
+  opacity:.58;
   animation-delay:-18s;
 }
 .planet-e{
@@ -182,7 +190,7 @@ td.num,th.num{text-align:right}
   background:
     radial-gradient(circle at 30% 26%, rgba(255,255,255,.82), transparent 13%),
     radial-gradient(circle at 42% 42%, #f0abfc 0%, #a21caf 44%, #111827 84%);
-  opacity:.40;
+  opacity:.56;
   animation-delay:-5s;
 }
 .planet-f{
@@ -190,7 +198,7 @@ td.num,th.num{text-align:right}
   background:
     radial-gradient(circle at 30% 26%, rgba(255,255,255,.80), transparent 13%),
     radial-gradient(circle at 42% 42%, #93c5fd 0%, #1d4ed8 44%, #020617 84%);
-  opacity:.48;
+  opacity:.62;
   animation-delay:-16s;
 }
 .planet-g{
@@ -198,7 +206,7 @@ td.num,th.num{text-align:right}
   background:
     radial-gradient(circle at 30% 26%, rgba(255,255,255,.76), transparent 12%),
     radial-gradient(circle at 42% 42%, #fdba74 0%, #ea580c 42%, #312e81 84%);
-  opacity:.38;
+  opacity:.54;
   animation-delay:-12s;
 }
 .planet-h{
@@ -206,7 +214,7 @@ td.num,th.num{text-align:right}
   background:
     radial-gradient(circle at 32% 28%, rgba(255,255,255,.85), transparent 14%),
     radial-gradient(circle at 42% 42%, #fef3c7 0%, #f59e0b 46%, #020617 84%);
-  opacity:.52;
+  opacity:.66;
   animation-delay:-20s;
 }
 .orbit{
@@ -228,7 +236,7 @@ td.num,th.num{text-align:right}
 }
 @keyframes orbitPulse{
   0%,100%{opacity:.18;scale:1}
-  50%{opacity:.48;scale:1.04}
+  50%{opacity:.62;scale:1.04}
 }
 .panel,.kpi{
   backdrop-filter: blur(8px);
