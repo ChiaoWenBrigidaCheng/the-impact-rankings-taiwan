@@ -9,7 +9,7 @@
 <style>
 :root {
   --bg:#050814; --panel:#0d1428; --panel2:#111b34; --line:rgba(148,163,184,.25);
-  --text:#f8fafc; --muted:#b7c3d8; --accent:#6ee7ff; --accent2:#a78bfa; --good:#34d399;
+  --text:#f8fafc; --muted:#b7c3d8; --accent:#6ee7ff; --accent-rgb:110,231,255; --accent2:#a78bfa; --mx:0; --my:0; --good:#34d399;
 }
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100%;font-family:"Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;background:var(--bg);color:var(--text)}
@@ -17,42 +17,51 @@ body::before{
   content:"";
   position:fixed;
   inset:0;
-  z-index:-4;
+  z-index:-3;
   background:
-    radial-gradient(circle at 20% 12%, rgba(59,130,246,.22), transparent 28%),
-    radial-gradient(circle at 78% 10%, rgba(168,85,247,.20), transparent 24%),
-    radial-gradient(circle at 70% 78%, rgba(45,212,191,.12), transparent 30%),
-    linear-gradient(180deg,#020617 0%,#071226 42%,#030712 100%);
+    radial-gradient(circle at 18% 18%, rgba(88,166,255,.26), transparent 28%),
+    radial-gradient(circle at 76% 12%, rgba(168,85,247,.22), transparent 24%),
+    radial-gradient(circle at 68% 78%, rgba(45,212,191,.14), transparent 30%),
+    radial-gradient(circle at 38% 54%, rgba(251,191,36,.08), transparent 24%),
+    linear-gradient(180deg,#030712 0%,#071226 42%,#050816 100%);
 }
 body::after{
   content:"";
   position:fixed;
   inset:0;
   z-index:0;
-  pointer-events:none;
-  background:radial-gradient(circle at center, transparent 0%, rgba(0,0,0,.18) 72%, rgba(0,0,0,.42) 100%);
+  opacity:.32;
+  background-image:
+    radial-gradient(#ffffff 0.7px, transparent 0.8px),
+    radial-gradient(#93c5fd 0.8px, transparent 0.9px),
+    radial-gradient(#c4b5fd 0.6px, transparent 0.8px);
+  background-size:72px 72px,132px 132px,210px 210px;
+  background-position:0 0,38px 56px,120px 80px;
+  animation:starDrift 46s linear infinite;
 }
 @keyframes starDrift{
   from{transform:translate3d(0,0,0)}
   to{transform:translate3d(-80px,40px,0)}
 }
-.wrap{width:min(1560px,94vw);margin:0 auto;padding:28px 0 48px;position:relative;z-index:3}
+.wrap{width:min(1560px,94vw);margin:0 auto;padding:28px 0 48px;position:relative;z-index:2}
 .hero{display:flex;justify-content:center;gap:18px;align-items:center;margin:8px 0 22px;text-align:center}
-h1{font-size:clamp(34px,4.8vw,68px);line-height:1.08;margin:0;font-weight:900;letter-spacing:.025em;color:#ffffff;text-shadow:0 0 16px rgba(110,231,255,.40),0 0 34px rgba(168,85,247,.18)}
+h1{font-size:clamp(34px,4.8vw,68px);line-height:1.08;margin:0;font-weight:900;letter-spacing:.025em;color:#ffffff;text-shadow:0 0 16px rgba(var(--accent-rgb),.40),0 0 34px rgba(168,85,247,.18)}
 .subtitle{margin:12px 0 0;color:var(--muted);font-size:16px}
 .badge{display:none}
-.panel{background:linear-gradient(180deg,rgba(17,27,52,.88),rgba(8,13,28,.92));border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:0 12px 34px rgba(0,0,0,.25), inset 0 1px 0 rgba(110,231,255,.08)}
+.panel{background:linear-gradient(180deg,rgba(17,27,52,.88),rgba(8,13,28,.92));border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:0 12px 34px rgba(0,0,0,.25), inset 0 1px 0 rgba(var(--accent-rgb),.08)}
 .controls{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:14px;margin:18px 0}
 label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
 select,input{width:100%;background:#081020;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:11px 12px;font-size:15px;outline:none}
+select:focus,input:focus{border-color:rgba(var(--accent-rgb),.75);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12)}
 .grid-main{display:grid;grid-template-columns:minmax(0,2fr) minmax(360px,.85fr);gap:18px;align-items:start}
 .grid-two{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
 .card-title{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
 h2{margin:0;font-size:22px;line-height:1.35;white-space:normal;overflow:visible}
+
 .note{font-size:12px;color:var(--muted);line-height:1.6;margin-top:10px}
 .chartbox{height:340px;position:relative}
 .chartbox.tall{height:440px}
-.kpis{display:grid;grid-template-columns:1.4fr 1fr 1fr 1.25fr 1.45fr;gap:12px;margin:0 0 18px}
+.kpis{display:grid;grid-template-columns:1.4fr 1fr 1fr 1.6fr;gap:12px;margin:0 0 18px}
 .kpi{padding:14px;border-radius:18px;background:rgba(15,23,42,.72);border:1px solid var(--line);box-shadow:0 8px 24px rgba(0,0,0,.22)}
 .kpi .v{font-size:26px;font-weight:800;margin-top:4px}
 .kpi .l{font-size:12px;color:var(--muted)}
@@ -82,180 +91,75 @@ td.num,th.num{text-align:right}
 
 .title-main{
   display:block;
-  font-size:clamp(34px,4.8vw,64px);
-  line-height:1.15;
-  color:#ffffff;
-  text-align:center;
+  font-size:clamp(30px,4.6vw,62px);
+  line-height:1.12;
 }
 .title-sub{
   display:block;
-  margin-top:12px;
-  font-size:clamp(16px,2vw,24px);
-  font-weight:500;
-  letter-spacing:.0.35em;
-  color:#93c5fd;
-  text-transform:uppercase;
-  text-align:center;
-  text-shadow:0 0 12px rgba(147,197,253,.35);
+  margin-top:8px;
+  font-size:clamp(20px,3vw,40px);
+  letter-spacing:.12em;
+  color:#c7d2fe;
+  text-shadow:0 0 16px rgba(167,139,250,.38),0 0 30px rgba(var(--accent-rgb),.18);
 }
 
 
-
-  100%{transform:translate3d(3%,2%,0) rotate(4deg) scale(1.05)}
-}
-
-  50%{opacity:.62;scale:1.04}
-}
-.panel,.kpi{
-  backdrop-filter: blur(8px);
-}
-
-.space-effects{
-  position:fixed;
-  inset:0;
-  overflow:hidden;
-  pointer-events:none;
-  z-index:1;
-}
-.starfield{
-  position:absolute;
-  inset:-20%;
-  background-repeat:repeat;
-  opacity:.72;
-  animation:starDrift 70s linear infinite;
-}
-.starfield-far{
-  background-image:
-    radial-gradient(#ffffff 0.55px, transparent 0.8px),
-    radial-gradient(#93c5fd 0.45px, transparent 0.8px);
-  background-size:42px 42px,68px 68px;
-  background-position:0 0,19px 27px;
-  opacity:.45;
-}
-.starfield-mid{
-  background-image:
-    radial-gradient(#dbeafe 0.9px, transparent 1.2px),
-    radial-gradient(#c4b5fd 0.8px, transparent 1.2px);
-  background-size:92px 92px,136px 136px;
-  background-position:14px 30px,70px 16px;
-  opacity:.50;
-  animation-duration:96s;
-}
-.starfield-near{
-  background-image:
-    radial-gradient(#ffffff 1.25px, transparent 1.7px),
-    radial-gradient(#bae6fd 1.1px, transparent 1.6px);
-  background-size:190px 190px,260px 260px;
-  background-position:60px 80px,120px 20px;
-  opacity:.34;
-  animation:starDrift 125s linear infinite, starTwinkle 4.6s ease-in-out infinite alternate;
-}
-@keyframes starDrift{
-  from{transform:translate3d(0,0,0)}
-  to{transform:translate3d(-120px,72px,0)}
-}
-@keyframes starTwinkle{
-  0%{opacity:.22;filter:brightness(.9)}
-  50%{opacity:.48;filter:brightness(1.35)}
-  100%{opacity:.30;filter:brightness(1)}
-}
 .nebula{
-  position:absolute;
-  width:72vw;
-  height:72vw;
-  border-radius:50%;
-  filter:blur(46px);
-  opacity:.34;
-  mix-blend-mode:screen;
+  position:fixed;
+  inset:-20%;
+  z-index:0;
+  pointer-events:none;
+  opacity:.62;
+  background:
+    conic-gradient(from 80deg at 42% 48%,
+      transparent 0deg,
+      rgba(59,130,246,.20) 52deg,
+      rgba(168,85,247,.16) 112deg,
+      rgba(45,212,191,.13) 168deg,
+      transparent 238deg,
+      rgba(251,191,36,.09) 290deg,
+      transparent 360deg);
+  filter:blur(34px);
   animation:nebulaFlow 34s ease-in-out infinite alternate;
-}
-.nebula-blue{
-  left:-18vw;
-  top:-18vw;
-  background:radial-gradient(circle, rgba(59,130,246,.35), rgba(59,130,246,.08) 42%, transparent 70%);
-}
-.nebula-purple{
-  right:-20vw;
-  top:-24vw;
-  background:radial-gradient(circle, rgba(168,85,247,.32), rgba(168,85,247,.08) 44%, transparent 72%);
-  animation-delay:-11s;
-}
-.nebula-teal{
-  right:8vw;
-  bottom:-30vw;
-  background:radial-gradient(circle, rgba(45,212,191,.24), rgba(45,212,191,.07) 42%, transparent 70%);
-  animation-delay:-18s;
 }
 @keyframes nebulaFlow{
   0%{transform:translate3d(-2%,0,0) rotate(-2deg) scale(1)}
-  100%{transform:translate3d(4%,2%,0) rotate(5deg) scale(1.06)}
+  100%{transform:translate3d(3%,2%,0) rotate(4deg) scale(1.05)}
 }
-.meteor{
-  position:absolute;
-  width:180px;
-  height:2px;
-  border-radius:999px;
-  background:linear-gradient(90deg, transparent, rgba(255,255,255,.95), rgba(125,211,252,.75), transparent);
-  opacity:0;
-  transform:rotate(-28deg);
-  filter:drop-shadow(0 0 8px rgba(125,211,252,.55));
-}
-.meteor::after{
-  content:"";
-  position:absolute;
-  right:18px;
-  top:-2px;
-  width:5px;
-  height:5px;
-  border-radius:50%;
-  background:#fff;
-  box-shadow:0 0 10px #fff;
-}
-.meteor-a{
-  left:72%;
-  top:13%;
-  animation:meteorFly 18s ease-in-out infinite;
-}
-.meteor-b{
-  left:48%;
-  top:46%;
-  width:120px;
-  opacity:0;
-  animation:meteorFly 26s ease-in-out infinite;
-  animation-delay:-9s;
-}
-@keyframes meteorFly{
-  0%,82%,100%{opacity:0;transform:translate3d(0,0,0) rotate(-28deg)}
-  86%{opacity:.9}
-  92%{opacity:0;transform:translate3d(-420px,220px,0) rotate(-28deg)}
+.cosmic-objects{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  overflow:hidden;
+  z-index:1;
 }
 .planet{
   position:absolute;
   display:block;
   border-radius:50%;
-  opacity:.72;
-  filter:drop-shadow(0 0 28px rgba(110,231,255,.22));
+  opacity:.78;
+  filter:drop-shadow(0 0 28px rgba(var(--accent-rgb),.20));
   animation:planetFloat 24s ease-in-out infinite;
 }
 .planet::before{
   content:"";
   position:absolute;
-  inset:-42%;
+  inset:-35%;
   border-radius:50%;
-  background:radial-gradient(circle, rgba(110,231,255,.18), transparent 64%);
+  background:radial-gradient(circle, rgba(var(--accent-rgb),.18), transparent 62%);
   z-index:-1;
 }
 .planet i{
   position:absolute;
-  inset:-22%;
+  inset:-20%;
   border-radius:50%;
   border:1px solid rgba(226,232,240,.30);
-  transform:rotate(-18deg) scaleX(1.55);
+  transform:rotate(-18deg) scaleX(1.52);
 }
 .planet-a{
   width:116px;height:116px;right:5.5%;top:15%;
   background:
-    radial-gradient(circle at 28% 24%, rgba(255,255,255,.88), transparent 10%),
+    radial-gradient(circle at 28% 24%, rgba(255,255,255,.86), transparent 10%),
     radial-gradient(circle at 34% 35%, #7dd3fc 0%, #2563eb 33%, #1e1b4b 76%);
   animation-delay:-2s;
 }
@@ -264,7 +168,7 @@ td.num,th.num{text-align:right}
   background:
     radial-gradient(circle at 30% 25%, rgba(255,255,255,.78), transparent 12%),
     radial-gradient(circle at 40% 40%, #fde68a 0%, #d97706 42%, #4c1d95 84%);
-  opacity:.58;
+  opacity:.62;
   animation-delay:-9s;
 }
 .planet-c{
@@ -272,7 +176,7 @@ td.num,th.num{text-align:right}
   background:
     radial-gradient(circle at 32% 28%, rgba(255,255,255,.88), transparent 14%),
     radial-gradient(circle at 42% 42%, #c4b5fd 0%, #7c3aed 46%, #111827 84%);
-  opacity:.56;
+  opacity:.60;
   animation-delay:-14s;
 }
 .planet-d{
@@ -288,7 +192,7 @@ td.num,th.num{text-align:right}
   background:
     radial-gradient(circle at 30% 26%, rgba(255,255,255,.82), transparent 13%),
     radial-gradient(circle at 42% 42%, #f0abfc 0%, #a21caf 44%, #111827 84%);
-  opacity:.54;
+  opacity:.56;
   animation-delay:-5s;
 }
 .planet-f{
@@ -304,7 +208,7 @@ td.num,th.num{text-align:right}
   background:
     radial-gradient(circle at 30% 26%, rgba(255,255,255,.76), transparent 12%),
     radial-gradient(circle at 42% 42%, #fdba74 0%, #ea580c 42%, #312e81 84%);
-  opacity:.48;
+  opacity:.54;
   animation-delay:-12s;
 }
 .planet-h{
@@ -315,21 +219,9 @@ td.num,th.num{text-align:right}
   opacity:.66;
   animation-delay:-20s;
 }
-.planet-i{
-  width:18px;height:18px;left:14%;top:14%;
-  background:radial-gradient(circle at 32% 28%, #fff, transparent 14%), radial-gradient(circle at 42% 42%, #a7f3d0 0%, #059669 46%, #020617 84%);
-  opacity:.58;
-  animation-delay:-22s;
-}
-.planet-j{
-  width:26px;height:26px;right:42%;bottom:9%;
-  background:radial-gradient(circle at 32% 28%, #fff, transparent 14%), radial-gradient(circle at 42% 42%, #fecdd3 0%, #e11d48 46%, #020617 84%);
-  opacity:.52;
-  animation-delay:-24s;
-}
 .orbit{
   position:absolute;
-  border:1px solid rgba(110,231,255,.14);
+  border:1px solid rgba(var(--accent-rgb),.14);
   border-radius:50%;
   transform:rotate(-18deg);
   opacity:.36;
@@ -346,18 +238,11 @@ td.num,th.num{text-align:right}
 }
 @keyframes orbitPulse{
   0%,100%{opacity:.18;scale:1}
-  50%{opacity:.48;scale:1.04}
+  50%{opacity:.62;scale:1.04}
 }
 .panel,.kpi{
   backdrop-filter: blur(8px);
 }
-@media(max-width:1050px){
-  .planet-a{width:64px;height:64px;right:3%;top:10%}
-  .planet-b,.planet-e,.planet-f,.planet-g,.planet-h,.planet-i,.planet-j,.orbit-b,.orbit-c,.orbit-d{display:none}
-  .orbit-a{width:260px;height:78px;right:-80px;top:92px}
-  .meteor{display:none}
-}
-
 @media(max-width:1050px){
   .planet-a{width:64px;height:64px;right:3%;top:10%}
   .planet-b,.planet-e,.planet-f,.planet-g,.planet-h,.orbit-b,.orbit-c,.orbit-d{display:none}
@@ -371,18 +256,283 @@ td.num,th.num{text-align:right}
 }
 
 @media(max-width:1050px){.controls,.grid-main,.grid-two,.kpis{grid-template-columns:1fr}.badge{display:none}.chartbox,.chartbox.tall{height:320px}}
+
+/* v19 Ultimate Visual: deeper cosmic field, natural meteors, parallax */
+.space-effects{
+  transform:translate3d(calc(var(--mx) * -12px), calc(var(--my) * -10px), 0);
+  transition:transform .18s ease-out;
+}
+.nebula{
+  opacity:.42;
+  transform:translate3d(calc(var(--mx) * 16px), calc(var(--my) * 12px), 0);
+}
+.starfield-far{
+  background-image:
+    radial-gradient(#ffffff 0.45px, transparent 0.8px),
+    radial-gradient(#93c5fd 0.45px, transparent 0.8px),
+    radial-gradient(#c4b5fd 0.35px, transparent 0.7px);
+  background-size:28px 28px,47px 47px,72px 72px;
+  opacity:.52;
+}
+.starfield-mid{
+  background-image:
+    radial-gradient(#dbeafe 0.75px, transparent 1.1px),
+    radial-gradient(#c4b5fd 0.7px, transparent 1.1px),
+    radial-gradient(rgba(var(--accent-rgb),.9) 0.65px, transparent 1.1px);
+  background-size:64px 64px,104px 104px,154px 154px;
+  opacity:.58;
+}
+.starfield-near{
+  background-image:
+    radial-gradient(#ffffff 1.1px, transparent 1.7px),
+    radial-gradient(#bae6fd 1px, transparent 1.6px),
+    radial-gradient(rgba(var(--accent-rgb),.92) 1.25px, transparent 1.8px);
+  background-size:140px 140px,210px 210px,310px 310px;
+  opacity:.42;
+}
+.visual-depth{
+  position:fixed;
+  inset:0;
+  overflow:hidden;
+  z-index:1;
+  pointer-events:none;
+  transform:translate3d(calc(var(--mx) * 8px), calc(var(--my) * 6px), 0);
+}
+.dust{
+  position:absolute;
+  inset:-12%;
+  opacity:.26;
+  background-image:
+    radial-gradient(rgba(255,255,255,.55) .45px, transparent .7px),
+    radial-gradient(rgba(var(--accent-rgb),.50) .35px, transparent .65px);
+  background-size:18px 18px,31px 31px;
+  animation:dustFloat 120s linear infinite;
+}
+.dust-b{
+  opacity:.18;
+  background-size:23px 23px,39px 39px;
+  animation-duration:170s;
+  animation-direction:reverse;
+}
+@keyframes dustFloat{
+  from{transform:translate3d(0,0,0)}
+  to{transform:translate3d(-160px,90px,0)}
+}
+.glow-star{
+  position:absolute;
+  width:4px;
+  height:4px;
+  border-radius:50%;
+  background:#fff;
+  box-shadow:0 0 10px #fff,0 0 22px rgba(var(--accent-rgb),.75);
+  opacity:.66;
+  animation:glowPulse 5.5s ease-in-out infinite;
+}
+.gs1{left:16%;top:20%;animation-delay:-1s}
+.gs2{right:24%;top:26%;animation-delay:-3s}
+.gs3{left:38%;bottom:18%;animation-delay:-5s}
+.gs4{right:13%;bottom:34%;animation-delay:-7s}
+@keyframes glowPulse{
+  0%,100%{opacity:.28;scale:.72}
+  50%{opacity:.95;scale:1.25}
+}
+.comet{
+  position:absolute;
+  width:240px;
+  height:2px;
+  border-radius:999px;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,.95), rgba(var(--accent-rgb),.78), transparent);
+  opacity:0;
+  filter:drop-shadow(0 0 10px rgba(var(--accent-rgb),.62));
+  transform:rotate(-26deg);
+}
+.comet::after{
+  content:"";
+  position:absolute;
+  right:28px;
+  top:-2.5px;
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:#fff;
+  box-shadow:0 0 14px #fff,0 0 28px rgba(var(--accent-rgb),.78);
+}
+.comet-a{left:78%;top:8%;animation:cometSweep 33s ease-in-out infinite}
+.comet-b{left:62%;top:38%;width:160px;animation:cometSweep 47s ease-in-out infinite;animation-delay:-18s}
+.comet-c{left:92%;top:62%;width:210px;animation:cometSweep 59s ease-in-out infinite;animation-delay:-31s}
+@keyframes cometSweep{
+  0%,86%,100%{opacity:0;transform:translate3d(0,0,0) rotate(-26deg)}
+  89%{opacity:.96}
+  95%{opacity:0;transform:translate3d(-560px,290px,0) rotate(-26deg)}
+}
+.planet{
+  transform:translate3d(calc(var(--mx) * 10px), calc(var(--my) * 8px), 0);
+}
+.planet-a,.planet-g{
+  filter:drop-shadow(0 0 34px rgba(var(--accent-rgb),.30));
+}
+.panel{
+  box-shadow:
+    0 12px 34px rgba(0,0,0,.28),
+    inset 0 1px 0 rgba(var(--accent-rgb),.10),
+    0 0 0 1px rgba(var(--accent-rgb),.04);
+}
+.kpi{
+  transition:border-color .35s ease, box-shadow .35s ease, transform .25s ease;
+}
+.kpi:hover{
+  border-color:rgba(var(--accent-rgb),.40);
+  box-shadow:0 10px 30px rgba(0,0,0,.25),0 0 22px rgba(var(--accent-rgb),.12);
+  transform:translateY(-2px);
+}
+@media(max-width:1050px){
+  .visual-depth{display:none}
+  .space-effects{transform:none}
+}
+
+
+/* v23 trend chart refactor: HTML/CSS 90-degree axis labels */
+.trend-chart-frame{
+  position:relative;
+  padding:8px 54px 0 58px;
+  min-height:450px;
+}
+.trend-canvas-box{
+  height:440px;
+}
+.axis-title{
+  position:absolute;
+  top:50%;
+  z-index:4;
+  color:#dbeafe;
+  font-weight:800;
+  letter-spacing:.08em;
+  font-size:13px;
+  white-space:nowrap;
+  text-shadow:0 0 10px rgba(var(--accent-rgb),.26);
+  pointer-events:none;
+}
+.axis-title-left{
+  left:6px;
+  transform:translateY(-50%) rotate(-90deg);
+  transform-origin:center;
+}
+.axis-title-right{
+  right:0;
+  transform:translateY(-50%) rotate(90deg);
+  transform-origin:center;
+}
+@media(max-width:1050px){
+  .trend-chart-frame{padding:8px 38px 0 42px;min-height:340px}
+  .trend-canvas-box{height:320px}
+  .axis-title{font-size:12px}
+}
+
+
+/* v24 Professional Edition: cleaner typography and restrained dashboard styling */
+h1,
+.title-main,
+.title-sub,
+.axis-title{
+  text-shadow:none !important;
+}
+
+h1{
+  color:#f8fafc !important;
+  letter-spacing:.015em !important;
+}
+
+.title-main{
+  font-weight:850 !important;
+}
+
+.title-sub{
+  color:#cbd5e1 !important;
+  letter-spacing:.08em !important;
+  font-weight:600 !important;
+}
+
+.panel{
+  background:linear-gradient(180deg,rgba(15,23,42,.92),rgba(8,13,28,.94)) !important;
+  box-shadow:0 14px 32px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.04) !important;
+  border-color:rgba(148,163,184,.22) !important;
+}
+
+.kpi{
+  background:rgba(15,23,42,.76) !important;
+  box-shadow:0 8px 22px rgba(0,0,0,.22) !important;
+  transition:border-color .2s ease, transform .2s ease !important;
+}
+
+.kpi:hover{
+  border-color:rgba(148,163,184,.34) !important;
+  box-shadow:0 10px 26px rgba(0,0,0,.24) !important;
+  transform:translateY(-1px) !important;
+}
+
+.kpi .v{
+  color:#f8fafc;
+  text-shadow:none !important;
+}
+
+select:focus,
+input:focus{
+  border-color:rgba(148,163,184,.62) !important;
+  box-shadow:0 0 0 3px rgba(148,163,184,.10) !important;
+}
+
+.axis-title{
+  color:#cbd5e1 !important;
+  font-weight:700 !important;
+}
+
+.planet,
+.planet-a,
+.planet-g{
+  filter:drop-shadow(0 0 12px rgba(148,163,184,.14)) !important;
+}
+
+.planet::before{
+  background:radial-gradient(circle, rgba(148,163,184,.08), transparent 64%) !important;
+}
+
+.orbit{
+  border-color:rgba(148,163,184,.16) !important;
+}
+
+.meteor,
+.comet{
+  filter:drop-shadow(0 0 5px rgba(148,163,184,.28)) !important;
+}
+
+.glow-star{
+  box-shadow:0 0 6px rgba(255,255,255,.6) !important;
+}
+
+tr:hover td{
+  background:rgba(148,163,184,.07) !important;
+}
+
+.chartbox canvas{
+  filter:none !important;
+}
+
 </style>
 </head>
 <body>
-<div class="space-effects" aria-hidden="true">
-  <div class="nebula nebula-blue"></div>
-  <div class="nebula nebula-purple"></div>
-  <div class="nebula nebula-teal"></div>
-  <div class="starfield starfield-far"></div>
-  <div class="starfield starfield-mid"></div>
-  <div class="starfield starfield-near"></div>
-  <span class="meteor meteor-a"></span>
-  <span class="meteor meteor-b"></span>
+<div class="visual-depth" aria-hidden="true">
+  <div class="dust dust-a"></div>
+  <div class="dust dust-b"></div>
+  <span class="glow-star gs1"></span>
+  <span class="glow-star gs2"></span>
+  <span class="glow-star gs3"></span>
+  <span class="glow-star gs4"></span>
+  <span class="comet comet-a"></span>
+  <span class="comet comet-b"></span>
+  <span class="comet comet-c"></span>
+</div>
+<div class="nebula" aria-hidden="true"></div>
+<div class="cosmic-objects" aria-hidden="true">
   <span class="planet planet-a"><i></i></span>
   <span class="planet planet-b"><i></i></span>
   <span class="planet planet-c"><i></i></span>
@@ -391,8 +541,6 @@ td.num,th.num{text-align:right}
   <span class="planet planet-f"><i></i></span>
   <span class="planet planet-g"><i></i></span>
   <span class="planet planet-h"><i></i></span>
-  <span class="planet planet-i"><i></i></span>
-  <span class="planet planet-j"><i></i></span>
   <span class="orbit orbit-a"></span>
   <span class="orbit orbit-b"></span>
   <span class="orbit orbit-c"></span>
@@ -401,11 +549,9 @@ td.num,th.num{text-align:right}
 <div class="wrap">
   <section class="hero">
     <div>
-      <h1>
-          <span class="title-main">台灣大專校院 
-          </span>THE Impact Rankings 追蹤平台</span>
-          <span class="title-sub">2019-2026區間</span>
-      <h1>
+      <h1><span class="title-main">台灣大專校院 
+          </span> THE Impact Rankings 追蹤平台</span>
+          <span class="title-sub">2019-2026區間</span></h1>
     </div>
   </section>
 
@@ -421,13 +567,17 @@ td.num,th.num{text-align:right}
   <section class="grid-main">
     <div class="panel">
       <div class="card-title"><h2>選定學校年度趨勢</h2></div>
-      <div class="chartbox tall"><canvas id="trendChart"></canvas></div>
-      <div class="note">計算方式：Overall 若為區間，圖表採「總分中點」，亦即區間上下限平均值；世界排名採排名區間下限；臺灣排名依原始資料欄位呈現。缺漏資料不繪製。</div>
+      <div class="trend-chart-frame">
+        <div class="axis-title axis-title-left">總分中點</div>
+        <div class="axis-title axis-title-right">數值／排名</div>
+        <div class="chartbox tall trend-canvas-box"><canvas id="trendChart"></canvas></div>
+      </div>
+      <div class="note">計算方式：Overall 若為區間，圖表採「總分中點」，亦即區間上下限平均值；世界排名採排名區間下限；排名軸為反向顯示，排名越前面位置越高。</div>
     </div>
     <div class="panel">
       <div class="card-title"><h2>臺灣 Top 15 大學</h2></div>
       <div class="chartbox tall"><canvas id="topChart"></canvas></div>
-      <div class="note">計算方式：依所選年度之臺灣排名由前至後排序，取前 15 名；標籤顯示 Overall 的總分中點。</div>
+      <div class="note">計算方式：依所選年度之臺灣排名由小至大排序，取前 15 名；標籤顯示 Overall 的總分中點。</div>
     </div>
   </section>
 
@@ -457,6 +607,52 @@ td.num,th.num{text-align:right}
 <script>
 let DATA = null;
 let charts = {};
+
+
+
+
+
+
+
+const SDG_COLORS = {
+  SDG1:"#E5243B", SDG2:"#DDA63A", SDG3:"#4C9F38", SDG4:"#C5192D", SDG5:"#FF3A21",
+  SDG6:"#26BDE2", SDG7:"#FCC30B", SDG8:"#A21942", SDG9:"#FD6925", SDG10:"#DD1367",
+  SDG11:"#FD9D24", SDG12:"#BF8B2E", SDG13:"#3F7E44", SDG14:"#0A97D9", SDG15:"#56C02B",
+  SDG16:"#00689D", SDG17:"#19486A"
+};
+const SDG_NAMES = {
+  SDG1:"No Poverty", SDG2:"Zero Hunger", SDG3:"Good Health and Well-being", SDG4:"Quality Education",
+  SDG5:"Gender Equality", SDG6:"Clean Water and Sanitation", SDG7:"Affordable and Clean Energy",
+  SDG8:"Decent Work and Economic Growth", SDG9:"Industry, Innovation and Infrastructure",
+  SDG10:"Reduced Inequalities", SDG11:"Sustainable Cities and Communities",
+  SDG12:"Responsible Consumption and Production", SDG13:"Climate Action", SDG14:"Life Below Water",
+  SDG15:"Life on Land", SDG16:"Peace, Justice and Strong Institutions", SDG17:"Partnerships for the Goals"
+};
+function hexToRgb(hex){
+  const h = hex.replace("#","");
+  const n = parseInt(h,16);
+  return `${(n>>16)&255},${(n>>8)&255},${n&255}`;
+}
+function setAccent(color){
+  document.documentElement.style.setProperty("--accent", color);
+  document.documentElement.style.setProperty("--accent-rgb", hexToRgb(color));
+}
+function verticalText(text){
+  return String(text).split("");
+}
+function rgbaFromHex(hex, alpha){
+  const rgb = hexToRgb(hex);
+  return `rgba(${rgb},${alpha})`;
+}
+function cssVar(name, fallback){
+  const val = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  return val || fallback;
+}
+function cssRgbaVar(name, alpha, fallbackRgb="110,231,255"){
+  const val = getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallbackRgb;
+  return `rgba(${val},${alpha})`;
+}
+
 
 function valueOrDash(v) {
   return (v === null || v === undefined || v === "" || Number.isNaN(v)) ? "—" : v;
@@ -513,7 +709,7 @@ function buildPayloadFromExcelRows(rows) {
 
 async function loadData() {
   try {
-    const res = await fetch("data.xlsm", {cache: "no-store"});
+    const res = await fetch("the_data.xlsm", {cache: "no-store"});
     if (!res.ok) throw new Error("data.xlsm not found");
     const buffer = await res.arrayBuffer();
     const workbook = XLSX.read(buffer, {type: "array"});
@@ -537,11 +733,86 @@ function destroyChart(id) {
 }
 function chartOptions(yTitle) {
   return {
-    responsive:true, maintainAspectRatio:false,
-    plugins:{legend:{labels:{color:"#e5e7eb"}}, tooltip:{mode:"index", intersect:false}},
+    responsive:true,
+    maintainAspectRatio:false,
+    layout:{padding:{left:8,right:8,top:4,bottom:4}},
+    animation:{duration:650,easing:"easeOutQuart"},
+    interaction:{mode:"index",intersect:false},
+    plugins:{
+      legend:{
+        display:true,
+        position:"top",
+        labels:{color:"#e5e7eb", usePointStyle:true, boxWidth:10, boxHeight:10, padding:18}
+      },
+      tooltip:{
+        mode:"index",
+        intersect:false,
+        backgroundColor:"rgba(15,23,42,.96)",
+        titleColor:"#f8fafc",
+        bodyColor:"#e5e7eb",
+        borderColor:"rgba(148,163,184,.28)",
+        borderWidth:1,
+        padding:12,
+        displayColors:true
+      }
+    },
     scales:{
       x:{ticks:{color:"#cbd5e1"}, grid:{color:"rgba(148,163,184,.12)"}},
-      y:{ticks:{color:"#cbd5e1"}, grid:{color:"rgba(148,163,184,.12)"}, title:{display:!!yTitle,text:yTitle,color:"#cbd5e1"}}
+      y:{
+        ticks:{color:"#cbd5e1"},
+        grid:{color:"rgba(148,163,184,.12)"},
+        title:{display:!!yTitle,text:yTitle,color:"#cbd5e1"}
+      }
+    }
+  };
+}
+function trendChartOptions() {
+  return {
+    responsive:true,
+    maintainAspectRatio:false,
+    layout:{padding:{left:10,right:12,top:4,bottom:4}},
+    animation:{duration:650,easing:"easeOutQuart"},
+    interaction:{mode:"index",intersect:false},
+    plugins:{
+      legend:{
+        display:true,
+        position:"top",
+        labels:{color:"#e5e7eb", usePointStyle:true, boxWidth:10, boxHeight:10, padding:18}
+      },
+      tooltip:{
+        mode:"index",
+        intersect:false,
+        backgroundColor:"rgba(15,23,42,.96)",
+        titleColor:"#f8fafc",
+        bodyColor:"#e5e7eb",
+        borderColor:"rgba(148,163,184,.28)",
+        borderWidth:1,
+        padding:12,
+        displayColors:true
+      }
+    },
+    scales:{
+      x:{
+        ticks:{color:"#cbd5e1"},
+        grid:{color:"rgba(148,163,184,.12)"}
+      },
+      yScore:{
+        type:"linear",
+        position:"left",
+        min:0,
+        suggestedMax:100,
+        ticks:{color:"#cbd5e1"},
+        grid:{color:"rgba(148,163,184,.12)"},
+        title:{display:false}
+      },
+      yRank:{
+        type:"linear",
+        position:"right",
+        reverse:true,
+        ticks:{color:"#cbd5e1"},
+        grid:{drawOnChartArea:false},
+        title:{display:false}
+      }
     }
   };
 }
@@ -575,6 +846,7 @@ function init() {
   updateAll();
 }
 function updateAll() {
+  setAccent("#6ee7ff");
   updateKpis(); updateTrend(); updateTop(); updateSdg(); updateDiff(); updateTable();
 }
 function updateKpis() {
@@ -593,23 +865,64 @@ function updateKpis() {
     <div class="kpi"><div class="l">選定學校</div><div class="v" style="font-size:20px">${school}</div></div>
     <div class="kpi"><div class="l">${baseYear} 總分中點</div><div class="v">${fmtNum(base?.overall_mid)}</div></div>
     <div class="kpi"><div class="l">${baseYear} 臺灣排名</div><div class="v">${valueOrDash(base?.taiwan_rank)}</div></div>
-    <div class="kpi"><div class="l">總分變化</div><div class="v" style="font-size:22px">${overallText}</div></div>
-    <div class="kpi"><div class="l">臺灣排名變化</div><div class="v" style="font-size:22px">${rankText}</div><div class="l" style="margin-top:8px;line-height:1.45">${explainText}</div></div>
+    <div class="kpi"><div class="l">比較結果</div><div class="v" style="font-size:20px">${overallText}｜${rankText}</div><div class="l" style="margin-top:8px;line-height:1.45">${explainText}</div></div>
   `;
 }
 function updateTrend() {
   const {school} = getSelected();
   const rows = DATA.records.filter(r=>r["學校"]===school).sort((a,b)=>Number(a["年度"])-Number(b["年度"]));
   const labels = rows.map(r=>String(r["年度"]));
+  const accent = cssVar("--accent", "#6ee7ff");
+  const accentFill = cssRgbaVar("--accent-rgb", .16);
   destroyChart("trendChart");
   charts.trendChart = new Chart(document.getElementById("trendChart"), {
     type:"line",
     data:{labels,datasets:[
-      {label:"總分中點", data:rows.map(r=>r.overall_mid), tension:.28, spanGaps:true},
-      {label:"臺灣排名", data:rows.map(r=>r.taiwan_rank), tension:.28, spanGaps:true},
-      {label:"世界排名下限", data:rows.map(r=>r.world_rank_low), tension:.28, spanGaps:true}
+      {
+        label:"總分中點",
+        data:rows.map(r=>r.overall_mid),
+        yAxisID:"yScore",
+        tension:.32,
+        spanGaps:true,
+        borderColor:accent,
+        backgroundColor:accentFill,
+        pointBackgroundColor:accent,
+        pointBorderColor:"#ffffff",
+        pointRadius:4,
+        pointHoverRadius:7,
+        borderWidth:3
+      },
+      {
+        label:"臺灣排名",
+        data:rows.map(r=>r.taiwan_rank),
+        yAxisID:"yRank",
+        tension:.32,
+        spanGaps:true,
+        borderColor:"#f59e0b",
+        backgroundColor:"rgba(245,158,11,.10)",
+        pointBackgroundColor:"#f59e0b",
+        pointBorderColor:"#ffffff",
+        pointRadius:4,
+        pointHoverRadius:7,
+        borderWidth:2.6
+      },
+      {
+        label:"世界排名下限",
+        data:rows.map(r=>r.world_rank_low),
+        yAxisID:"yRank",
+        tension:.32,
+        spanGaps:true,
+        borderColor:"#a78bfa",
+        backgroundColor:"rgba(167,139,250,.10)",
+        pointBackgroundColor:"#a78bfa",
+        pointBorderColor:"#ffffff",
+        pointRadius:4,
+        pointHoverRadius:7,
+        borderWidth:2.6,
+        borderDash:[6,4]
+      }
     ]},
-    options: chartOptions("數值 / 排名")
+    options: trendChartOptions()
   });
 }
 function updateTop() {
@@ -619,7 +932,7 @@ function updateTop() {
   destroyChart("topChart");
   charts.topChart = new Chart(document.getElementById("topChart"), {
     type:"bar",
-    data:{labels:rows.map(r=>r["學校"]),datasets:[{label:"總分中點",data:rows.map(r=>r.overall_mid)}]},
+    data:{labels:rows.map(r=>`${r.taiwan_rank}. ${r["學校"]}`),datasets:[{label:"總分中點",data:rows.map(r=>r.overall_mid),backgroundColor:"rgba(var(--accent-rgb),.62)",borderColor:"rgba(255,255,255,.18)",borderWidth:1}]},
     options:{...chartOptions("總分中點"), indexAxis:"y", plugins:{legend:{display:false}, tooltip:{callbacks:{label:(ctx)=>`總分中點：${fmtNum(ctx.raw)}；臺灣排名：${rows[ctx.dataIndex].taiwan_rank}`}}}}
   });
 }
@@ -628,25 +941,38 @@ function updateSdg() {
   const row = findRow(school, baseYear);
   const labels = DATA.sdgs;
   const vals = labels.map(s=>row ? row[s+"_mid"] : null);
+  const colors = labels.map(s=>SDG_COLORS[s] || "#6ee7ff");
   destroyChart("sdgChart");
   charts.sdgChart = new Chart(document.getElementById("sdgChart"), {
     type:"bar",
-    data:{labels,datasets:[{label:`${baseYear} SDG分數中點`,data:vals}]},
+    data:{labels,datasets:[{
+      label:`${baseYear} SDG分數中點`,
+      data:vals,
+      backgroundColor:colors.map(c=>c+"cc"),
+      borderColor:colors,
+      borderWidth:1
+    }]},
     options: chartOptions("分數中點")
   });
 }
 function updateDiff() {
   const {school, baseYear, compareYear} = getSelected();
   const base = findRow(school, baseYear), comp = findRow(school, compareYear);
-  const labels=[], vals=[];
+  const labels=[], vals=[], colors=[];
   for (const s of DATA.sdgs) {
     const b = base ? base[s+"_mid"] : null, c = comp ? comp[s+"_mid"] : null;
-    if (b!=null && c!=null) { labels.push(s); vals.push(Number((b-c).toFixed(2))); }
+    if (b!=null && c!=null) { labels.push(s); vals.push(Number((b-c).toFixed(2))); colors.push(SDG_COLORS[s] || "#6ee7ff"); }
   }
   destroyChart("diffChart");
   charts.diffChart = new Chart(document.getElementById("diffChart"), {
     type:"bar",
-    data:{labels,datasets:[{label:`${baseYear} − ${compareYear}`,data:vals}]},
+    data:{labels,datasets:[{
+      label:`${baseYear} − ${compareYear}`,
+      data:vals,
+      backgroundColor:colors.map(c=>c+"cc"),
+      borderColor:colors,
+      borderWidth:1
+    }]},
     options: chartOptions("分數差異")
   });
 }
@@ -661,6 +987,19 @@ function updateTable() {
   const body = rows.map(r=>`<tr>${cols.map(c=>`<td class="${["年度","臺灣排名"].includes(c)||c.startsWith("SDG")?"num":""}">${valueOrDash(r[c])}</td>`).join("")}</tr>`).join("");
   document.getElementById("dataTable").innerHTML = `<thead><tr>${th}</tr></thead><tbody>${body}</tbody>`;
 }
+let parallaxScheduled = false;
+document.addEventListener("mousemove", (event) => {
+  if (parallaxScheduled) return;
+  parallaxScheduled = true;
+  requestAnimationFrame(() => {
+    const x = (event.clientX / window.innerWidth - 0.5);
+    const y = (event.clientY / window.innerHeight - 0.5);
+    document.documentElement.style.setProperty("--mx", x.toFixed(3));
+    document.documentElement.style.setProperty("--my", y.toFixed(3));
+    parallaxScheduled = false;
+  });
+});
+
 loadData();
 </script>
 </body>
