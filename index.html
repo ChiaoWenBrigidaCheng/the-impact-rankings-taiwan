@@ -17,33 +17,26 @@ body::before{
   content:"";
   position:fixed;
   inset:0;
-  z-index:-3;
+  z-index:-4;
   background:
-    radial-gradient(circle at 18% 18%, rgba(88,166,255,.26), transparent 28%),
-    radial-gradient(circle at 76% 12%, rgba(168,85,247,.22), transparent 24%),
-    radial-gradient(circle at 68% 78%, rgba(45,212,191,.14), transparent 30%),
-    radial-gradient(circle at 38% 54%, rgba(251,191,36,.08), transparent 24%),
-    linear-gradient(180deg,#030712 0%,#071226 42%,#050816 100%);
+    radial-gradient(circle at 20% 12%, rgba(59,130,246,.22), transparent 28%),
+    radial-gradient(circle at 78% 10%, rgba(168,85,247,.20), transparent 24%),
+    radial-gradient(circle at 70% 78%, rgba(45,212,191,.12), transparent 30%),
+    linear-gradient(180deg,#020617 0%,#071226 42%,#030712 100%);
 }
 body::after{
   content:"";
   position:fixed;
   inset:0;
   z-index:0;
-  opacity:.32;
-  background-image:
-    radial-gradient(#ffffff 0.7px, transparent 0.8px),
-    radial-gradient(#93c5fd 0.8px, transparent 0.9px),
-    radial-gradient(#c4b5fd 0.6px, transparent 0.8px);
-  background-size:72px 72px,132px 132px,210px 210px;
-  background-position:0 0,38px 56px,120px 80px;
-  animation:starDrift 46s linear infinite;
+  pointer-events:none;
+  background:radial-gradient(circle at center, transparent 0%, rgba(0,0,0,.18) 72%, rgba(0,0,0,.42) 100%);
 }
 @keyframes starDrift{
   from{transform:translate3d(0,0,0)}
   to{transform:translate3d(-80px,40px,0)}
 }
-.wrap{width:min(1560px,94vw);margin:0 auto;padding:28px 0 48px;position:relative;z-index:2}
+.wrap{width:min(1560px,94vw);margin:0 auto;padding:28px 0 48px;position:relative;z-index:3}
 .hero{display:flex;justify-content:center;gap:18px;align-items:center;margin:8px 0 22px;text-align:center}
 h1{font-size:clamp(34px,4.8vw,68px);line-height:1.08;margin:0;font-weight:900;letter-spacing:.025em;color:#ffffff;text-shadow:0 0 16px rgba(110,231,255,.40),0 0 34px rgba(168,85,247,.18)}
 .subtitle{margin:12px 0 0;color:var(--muted);font-size:16px}
@@ -89,75 +82,180 @@ td.num,th.num{text-align:right}
 
 .title-main{
   display:block;
-  font-size:clamp(30px,4.6vw,62px);
-  line-height:1.12;
+  font-size:clamp(34px,4.8vw,64px);
+  line-height:1.15;
+  color:#ffffff;
+  text-align:center;
 }
 .title-sub{
   display:block;
-  margin-top:8px;
-  font-size:clamp(20px,3vw,40px);
-  letter-spacing:.12em;
-  color:#c7d2fe;
-  text-shadow:0 0 16px rgba(167,139,250,.38),0 0 30px rgba(110,231,255,.18);
+  margin-top:12px;
+  font-size:clamp(16px,2vw,24px);
+  font-weight:500;
+  letter-spacing:.0.35em;
+  color:#93c5fd;
+  text-transform:uppercase;
+  text-align:center;
+  text-shadow:0 0 12px rgba(147,197,253,.35);
 }
 
 
-.nebula{
+
+  100%{transform:translate3d(3%,2%,0) rotate(4deg) scale(1.05)}
+}
+
+  50%{opacity:.62;scale:1.04}
+}
+.panel,.kpi{
+  backdrop-filter: blur(8px);
+}
+
+.space-effects{
   position:fixed;
-  inset:-20%;
-  z-index:0;
+  inset:0;
+  overflow:hidden;
   pointer-events:none;
-  opacity:.62;
-  background:
-    conic-gradient(from 80deg at 42% 48%,
-      transparent 0deg,
-      rgba(59,130,246,.20) 52deg,
-      rgba(168,85,247,.16) 112deg,
-      rgba(45,212,191,.13) 168deg,
-      transparent 238deg,
-      rgba(251,191,36,.09) 290deg,
-      transparent 360deg);
-  filter:blur(34px);
+  z-index:1;
+}
+.starfield{
+  position:absolute;
+  inset:-20%;
+  background-repeat:repeat;
+  opacity:.72;
+  animation:starDrift 70s linear infinite;
+}
+.starfield-far{
+  background-image:
+    radial-gradient(#ffffff 0.55px, transparent 0.8px),
+    radial-gradient(#93c5fd 0.45px, transparent 0.8px);
+  background-size:42px 42px,68px 68px;
+  background-position:0 0,19px 27px;
+  opacity:.45;
+}
+.starfield-mid{
+  background-image:
+    radial-gradient(#dbeafe 0.9px, transparent 1.2px),
+    radial-gradient(#c4b5fd 0.8px, transparent 1.2px);
+  background-size:92px 92px,136px 136px;
+  background-position:14px 30px,70px 16px;
+  opacity:.50;
+  animation-duration:96s;
+}
+.starfield-near{
+  background-image:
+    radial-gradient(#ffffff 1.25px, transparent 1.7px),
+    radial-gradient(#bae6fd 1.1px, transparent 1.6px);
+  background-size:190px 190px,260px 260px;
+  background-position:60px 80px,120px 20px;
+  opacity:.34;
+  animation:starDrift 125s linear infinite, starTwinkle 4.6s ease-in-out infinite alternate;
+}
+@keyframes starDrift{
+  from{transform:translate3d(0,0,0)}
+  to{transform:translate3d(-120px,72px,0)}
+}
+@keyframes starTwinkle{
+  0%{opacity:.22;filter:brightness(.9)}
+  50%{opacity:.48;filter:brightness(1.35)}
+  100%{opacity:.30;filter:brightness(1)}
+}
+.nebula{
+  position:absolute;
+  width:72vw;
+  height:72vw;
+  border-radius:50%;
+  filter:blur(46px);
+  opacity:.34;
+  mix-blend-mode:screen;
   animation:nebulaFlow 34s ease-in-out infinite alternate;
+}
+.nebula-blue{
+  left:-18vw;
+  top:-18vw;
+  background:radial-gradient(circle, rgba(59,130,246,.35), rgba(59,130,246,.08) 42%, transparent 70%);
+}
+.nebula-purple{
+  right:-20vw;
+  top:-24vw;
+  background:radial-gradient(circle, rgba(168,85,247,.32), rgba(168,85,247,.08) 44%, transparent 72%);
+  animation-delay:-11s;
+}
+.nebula-teal{
+  right:8vw;
+  bottom:-30vw;
+  background:radial-gradient(circle, rgba(45,212,191,.24), rgba(45,212,191,.07) 42%, transparent 70%);
+  animation-delay:-18s;
 }
 @keyframes nebulaFlow{
   0%{transform:translate3d(-2%,0,0) rotate(-2deg) scale(1)}
-  100%{transform:translate3d(3%,2%,0) rotate(4deg) scale(1.05)}
+  100%{transform:translate3d(4%,2%,0) rotate(5deg) scale(1.06)}
 }
-.cosmic-objects{
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  overflow:hidden;
-  z-index:1;
+.meteor{
+  position:absolute;
+  width:180px;
+  height:2px;
+  border-radius:999px;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,.95), rgba(125,211,252,.75), transparent);
+  opacity:0;
+  transform:rotate(-28deg);
+  filter:drop-shadow(0 0 8px rgba(125,211,252,.55));
+}
+.meteor::after{
+  content:"";
+  position:absolute;
+  right:18px;
+  top:-2px;
+  width:5px;
+  height:5px;
+  border-radius:50%;
+  background:#fff;
+  box-shadow:0 0 10px #fff;
+}
+.meteor-a{
+  left:72%;
+  top:13%;
+  animation:meteorFly 18s ease-in-out infinite;
+}
+.meteor-b{
+  left:48%;
+  top:46%;
+  width:120px;
+  opacity:0;
+  animation:meteorFly 26s ease-in-out infinite;
+  animation-delay:-9s;
+}
+@keyframes meteorFly{
+  0%,82%,100%{opacity:0;transform:translate3d(0,0,0) rotate(-28deg)}
+  86%{opacity:.9}
+  92%{opacity:0;transform:translate3d(-420px,220px,0) rotate(-28deg)}
 }
 .planet{
   position:absolute;
   display:block;
   border-radius:50%;
-  opacity:.78;
-  filter:drop-shadow(0 0 28px rgba(110,231,255,.20));
+  opacity:.72;
+  filter:drop-shadow(0 0 28px rgba(110,231,255,.22));
   animation:planetFloat 24s ease-in-out infinite;
 }
 .planet::before{
   content:"";
   position:absolute;
-  inset:-35%;
+  inset:-42%;
   border-radius:50%;
-  background:radial-gradient(circle, rgba(110,231,255,.18), transparent 62%);
+  background:radial-gradient(circle, rgba(110,231,255,.18), transparent 64%);
   z-index:-1;
 }
 .planet i{
   position:absolute;
-  inset:-20%;
+  inset:-22%;
   border-radius:50%;
   border:1px solid rgba(226,232,240,.30);
-  transform:rotate(-18deg) scaleX(1.52);
+  transform:rotate(-18deg) scaleX(1.55);
 }
 .planet-a{
   width:116px;height:116px;right:5.5%;top:15%;
   background:
-    radial-gradient(circle at 28% 24%, rgba(255,255,255,.86), transparent 10%),
+    radial-gradient(circle at 28% 24%, rgba(255,255,255,.88), transparent 10%),
     radial-gradient(circle at 34% 35%, #7dd3fc 0%, #2563eb 33%, #1e1b4b 76%);
   animation-delay:-2s;
 }
@@ -166,7 +264,7 @@ td.num,th.num{text-align:right}
   background:
     radial-gradient(circle at 30% 25%, rgba(255,255,255,.78), transparent 12%),
     radial-gradient(circle at 40% 40%, #fde68a 0%, #d97706 42%, #4c1d95 84%);
-  opacity:.62;
+  opacity:.58;
   animation-delay:-9s;
 }
 .planet-c{
@@ -174,7 +272,7 @@ td.num,th.num{text-align:right}
   background:
     radial-gradient(circle at 32% 28%, rgba(255,255,255,.88), transparent 14%),
     radial-gradient(circle at 42% 42%, #c4b5fd 0%, #7c3aed 46%, #111827 84%);
-  opacity:.60;
+  opacity:.56;
   animation-delay:-14s;
 }
 .planet-d{
@@ -190,7 +288,7 @@ td.num,th.num{text-align:right}
   background:
     radial-gradient(circle at 30% 26%, rgba(255,255,255,.82), transparent 13%),
     radial-gradient(circle at 42% 42%, #f0abfc 0%, #a21caf 44%, #111827 84%);
-  opacity:.56;
+  opacity:.54;
   animation-delay:-5s;
 }
 .planet-f{
@@ -206,7 +304,7 @@ td.num,th.num{text-align:right}
   background:
     radial-gradient(circle at 30% 26%, rgba(255,255,255,.76), transparent 12%),
     radial-gradient(circle at 42% 42%, #fdba74 0%, #ea580c 42%, #312e81 84%);
-  opacity:.54;
+  opacity:.48;
   animation-delay:-12s;
 }
 .planet-h{
@@ -216,6 +314,18 @@ td.num,th.num{text-align:right}
     radial-gradient(circle at 42% 42%, #fef3c7 0%, #f59e0b 46%, #020617 84%);
   opacity:.66;
   animation-delay:-20s;
+}
+.planet-i{
+  width:18px;height:18px;left:14%;top:14%;
+  background:radial-gradient(circle at 32% 28%, #fff, transparent 14%), radial-gradient(circle at 42% 42%, #a7f3d0 0%, #059669 46%, #020617 84%);
+  opacity:.58;
+  animation-delay:-22s;
+}
+.planet-j{
+  width:26px;height:26px;right:42%;bottom:9%;
+  background:radial-gradient(circle at 32% 28%, #fff, transparent 14%), radial-gradient(circle at 42% 42%, #fecdd3 0%, #e11d48 46%, #020617 84%);
+  opacity:.52;
+  animation-delay:-24s;
 }
 .orbit{
   position:absolute;
@@ -236,11 +346,18 @@ td.num,th.num{text-align:right}
 }
 @keyframes orbitPulse{
   0%,100%{opacity:.18;scale:1}
-  50%{opacity:.62;scale:1.04}
+  50%{opacity:.48;scale:1.04}
 }
 .panel,.kpi{
   backdrop-filter: blur(8px);
 }
+@media(max-width:1050px){
+  .planet-a{width:64px;height:64px;right:3%;top:10%}
+  .planet-b,.planet-e,.planet-f,.planet-g,.planet-h,.planet-i,.planet-j,.orbit-b,.orbit-c,.orbit-d{display:none}
+  .orbit-a{width:260px;height:78px;right:-80px;top:92px}
+  .meteor{display:none}
+}
+
 @media(max-width:1050px){
   .planet-a{width:64px;height:64px;right:3%;top:10%}
   .planet-b,.planet-e,.planet-f,.planet-g,.planet-h,.orbit-b,.orbit-c,.orbit-d{display:none}
@@ -257,8 +374,15 @@ td.num,th.num{text-align:right}
 </style>
 </head>
 <body>
-<div class="nebula" aria-hidden="true"></div>
-<div class="cosmic-objects" aria-hidden="true">
+<div class="space-effects" aria-hidden="true">
+  <div class="nebula nebula-blue"></div>
+  <div class="nebula nebula-purple"></div>
+  <div class="nebula nebula-teal"></div>
+  <div class="starfield starfield-far"></div>
+  <div class="starfield starfield-mid"></div>
+  <div class="starfield starfield-near"></div>
+  <span class="meteor meteor-a"></span>
+  <span class="meteor meteor-b"></span>
   <span class="planet planet-a"><i></i></span>
   <span class="planet planet-b"><i></i></span>
   <span class="planet planet-c"><i></i></span>
@@ -267,6 +391,8 @@ td.num,th.num{text-align:right}
   <span class="planet planet-f"><i></i></span>
   <span class="planet planet-g"><i></i></span>
   <span class="planet planet-h"><i></i></span>
+  <span class="planet planet-i"><i></i></span>
+  <span class="planet planet-j"><i></i></span>
   <span class="orbit orbit-a"></span>
   <span class="orbit orbit-b"></span>
   <span class="orbit orbit-c"></span>
@@ -275,7 +401,11 @@ td.num,th.num{text-align:right}
 <div class="wrap">
   <section class="hero">
     <div>
-      <h1><span class="title-main">台灣大專校院 THE Impact Rankings 追蹤平台</span><span class="title-sub">2019-2026區間</span></h1>
+      <h1>
+          <span class="title-main">台灣大專校院 
+          </span>THE Impact Rankings 追蹤平台</span>
+          <span class="title-sub">2019-2026區間</span>
+      <h1>
     </div>
   </section>
 
