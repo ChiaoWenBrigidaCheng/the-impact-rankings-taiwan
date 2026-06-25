@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>THE 大學影響力排名 (台灣)</title>
+<title>台灣大專校院 THE Impact Rankings 追蹤平台｜2019-2026區間</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
 :root {
@@ -13,26 +13,41 @@
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100%;font-family:"Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;background:var(--bg);color:var(--text)}
 body::before{
-  content:"";position:fixed;inset:0;z-index:-2;
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-3;
   background:
-    radial-gradient(circle at 18% 12%, rgba(110,231,255,.16), transparent 28%),
-    radial-gradient(circle at 78% 8%, rgba(167,139,250,.14), transparent 24%),
-    radial-gradient(circle at 72% 78%, rgba(52,211,153,.08), transparent 26%),
-    linear-gradient(180deg,#050814 0%,#071020 50%,#040713 100%);
+    radial-gradient(circle at 18% 18%, rgba(88,166,255,.26), transparent 28%),
+    radial-gradient(circle at 76% 12%, rgba(168,85,247,.22), transparent 24%),
+    radial-gradient(circle at 68% 78%, rgba(45,212,191,.14), transparent 30%),
+    radial-gradient(circle at 38% 54%, rgba(251,191,36,.08), transparent 24%),
+    linear-gradient(180deg,#030712 0%,#071226 42%,#050816 100%);
 }
 body::after{
-  content:"";position:fixed;inset:0;z-index:-1;opacity:.18;
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-2;
+  opacity:.32;
   background-image:
-    radial-gradient(#fff 0.7px, transparent 0.8px),
-    radial-gradient(#c7d2fe 0.7px, transparent 0.8px);
-  background-size:80px 80px,130px 130px;background-position:0 0,40px 60px;
+    radial-gradient(#ffffff 0.7px, transparent 0.8px),
+    radial-gradient(#93c5fd 0.8px, transparent 0.9px),
+    radial-gradient(#c4b5fd 0.6px, transparent 0.8px);
+  background-size:72px 72px,132px 132px,210px 210px;
+  background-position:0 0,38px 56px,120px 80px;
+  animation:starDrift 46s linear infinite;
+}
+@keyframes starDrift{
+  from{transform:translate3d(0,0,0)}
+  to{transform:translate3d(-80px,40px,0)}
 }
 .wrap{width:min(1560px,94vw);margin:0 auto;padding:28px 0 48px}
-.hero{display:flex;justify-content:space-between;gap:18px;align-items:flex-end;margin-bottom:18px}
-h1{font-size:clamp(30px,4vw,58px);line-height:1.05;margin:0;font-weight:900;letter-spacing:.03em;text-shadow:0 0 8px rgba(110,231,255,.22)}
+.hero{display:flex;justify-content:center;gap:18px;align-items:center;margin:8px 0 22px;text-align:center}
+h1{font-size:clamp(34px,4.8vw,68px);line-height:1.08;margin:0;font-weight:900;letter-spacing:.025em;color:#ffffff;text-shadow:0 0 16px rgba(110,231,255,.40),0 0 34px rgba(168,85,247,.18)}
 .subtitle{margin:12px 0 0;color:var(--muted);font-size:16px}
-.badge{border:1px solid var(--line);background:rgba(15,23,42,.72);border-radius:999px;padding:10px 14px;color:var(--muted);white-space:nowrap}
-.panel{background:linear-gradient(180deg,rgba(17,27,52,.94),rgba(8,13,28,.94));border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:0 12px 34px rgba(0,0,0,.25)}
+.badge{display:none}
+.panel{background:linear-gradient(180deg,rgba(17,27,52,.88),rgba(8,13,28,.92));border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:0 12px 34px rgba(0,0,0,.25), inset 0 1px 0 rgba(110,231,255,.08)}
 .controls{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:14px;margin:18px 0}
 label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
 select,input{width:100%;background:#081020;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:11px 12px;font-size:15px;outline:none}
@@ -43,35 +58,206 @@ h2{margin:0;font-size:22px;line-height:1.35;white-space:normal;overflow:visible}
 .note{font-size:12px;color:var(--muted);line-height:1.6;margin-top:10px}
 .chartbox{height:340px;position:relative}
 .chartbox.tall{height:440px}
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:0 0 18px}
-.kpi{padding:14px;border-radius:18px;background:rgba(15,23,42,.7);border:1px solid var(--line)}
+.kpis{display:grid;grid-template-columns:1.4fr 1fr 1fr 1.25fr 1.45fr;gap:12px;margin:0 0 18px}
+.kpi{padding:14px;border-radius:18px;background:rgba(15,23,42,.72);border:1px solid var(--line);box-shadow:0 8px 24px rgba(0,0,0,.22)}
 .kpi .v{font-size:26px;font-weight:800;margin-top:4px}
 .kpi .l{font-size:12px;color:var(--muted)}
 .table-wrap{margin-top:18px;overflow:auto;max-height:640px;border-radius:18px;border:1px solid var(--line)}
-table{width:100%;border-collapse:collapse;min-width:1250px;background:rgba(8,13,28,.82)}
+table{width:100%;border-collapse:collapse;min-width:1250px;background:rgba(8,13,28,.86)}
 th,td{padding:10px 11px;border-bottom:1px solid rgba(148,163,184,.16);text-align:left;font-size:13px;white-space:nowrap}
 th{position:sticky;top:0;background:#101a31;color:#dbeafe;z-index:1}
 td.num,th.num{text-align:right}
 .muted{color:var(--muted)}
 .footer{margin-top:16px;color:var(--muted);font-size:12px;line-height:1.6}
+
+.planet-b,.orbit-b{display:none}
+  .orbit-a{width:260px;height:78px;right:-80px;top:92px}
+}
+
+
+.nebula{
+  position:fixed;
+  inset:-20%;
+  z-index:-2;
+  pointer-events:none;
+  opacity:.42;
+  background:
+    conic-gradient(from 80deg at 42% 48%,
+      transparent 0deg,
+      rgba(59,130,246,.18) 52deg,
+      rgba(168,85,247,.13) 112deg,
+      rgba(45,212,191,.12) 168deg,
+      transparent 238deg,
+      rgba(251,191,36,.08) 290deg,
+      transparent 360deg);
+  filter:blur(34px);
+  animation:nebulaFlow 34s ease-in-out infinite alternate;
+}
+@keyframes nebulaFlow{
+  0%{transform:translate3d(-2%,0,0) rotate(-2deg) scale(1)}
+  100%{transform:translate3d(3%,2%,0) rotate(4deg) scale(1.05)}
+}
+.cosmic-objects{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  overflow:hidden;
+  z-index:-1;
+}
+.planet{
+  position:absolute;
+  display:block;
+  border-radius:50%;
+  opacity:.58;
+  filter:drop-shadow(0 0 28px rgba(110,231,255,.18));
+  animation:planetFloat 24s ease-in-out infinite;
+}
+.planet i{
+  position:absolute;
+  inset:-20%;
+  border-radius:50%;
+  border:1px solid rgba(226,232,240,.24);
+  transform:rotate(-18deg) scaleX(1.52);
+}
+.planet-a{
+  width:110px;height:110px;right:6%;top:16%;
+  background:
+    radial-gradient(circle at 28% 24%, rgba(255,255,255,.86), transparent 10%),
+    radial-gradient(circle at 34% 35%, #7dd3fc 0%, #2563eb 33%, #1e1b4b 76%);
+  animation-delay:-2s;
+}
+.planet-b{
+  width:64px;height:64px;left:6%;top:66%;
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255,255,255,.78), transparent 12%),
+    radial-gradient(circle at 40% 40%, #fde68a 0%, #d97706 42%, #4c1d95 84%);
+  opacity:.46;
+  animation-delay:-9s;
+}
+.planet-c{
+  width:38px;height:38px;left:48%;top:12%;
+  background:
+    radial-gradient(circle at 32% 28%, rgba(255,255,255,.88), transparent 14%),
+    radial-gradient(circle at 42% 42%, #c4b5fd 0%, #7c3aed 46%, #111827 84%);
+  opacity:.40;
+  animation-delay:-14s;
+}
+.planet-d{
+  width:24px;height:24px;right:31%;top:72%;
+  background:
+    radial-gradient(circle at 32% 28%, rgba(255,255,255,.82), transparent 14%),
+    radial-gradient(circle at 42% 42%, #99f6e4 0%, #0f766e 46%, #020617 84%);
+  opacity:.42;
+  animation-delay:-18s;
+}
+.orbit{
+  position:absolute;
+  border:1px solid rgba(110,231,255,.14);
+  border-radius:50%;
+  transform:rotate(-18deg);
+  opacity:.34;
+  animation:orbitPulse 18s ease-in-out infinite;
+}
+.orbit-a{width:440px;height:124px;right:-96px;top:112px}
+.orbit-b{width:330px;height:92px;left:-72px;bottom:112px;animation-delay:-7s}
+@keyframes planetFloat{
+  0%,100%{transform:translate3d(0,0,0) rotate(0deg)}
+  35%{transform:translate3d(16px,-16px,0) rotate(3deg)}
+  70%{transform:translate3d(-12px,20px,0) rotate(-2deg)}
+}
+@keyframes orbitPulse{
+  0%,100%{opacity:.18;scale:1}
+  50%{opacity:.46;scale:1.04}
+}
+.panel,.kpi{
+  backdrop-filter: blur(8px);
+}
+
+
+.title-main{
+  display:block;
+  font-size:clamp(30px,4.6vw,62px);
+  line-height:1.12;
+}
+.title-sub{
+  display:block;
+  margin-top:8px;
+  font-size:clamp(20px,3vw,40px);
+  letter-spacing:.12em;
+  color:#c7d2fe;
+  text-shadow:0 0 16px rgba(167,139,250,.38),0 0 30px rgba(110,231,255,.18);
+}
+.planet-e{
+  width:48px;height:48px;right:18%;top:42%;
+  background:
+    radial-gradient(circle at 30% 26%, rgba(255,255,255,.82), transparent 13%),
+    radial-gradient(circle at 42% 42%, #f0abfc 0%, #a21caf 44%, #111827 84%);
+  opacity:.36;
+  animation-delay:-5s;
+}
+.planet-f{
+  width:30px;height:30px;left:24%;top:28%;
+  background:
+    radial-gradient(circle at 30% 26%, rgba(255,255,255,.80), transparent 13%),
+    radial-gradient(circle at 42% 42%, #93c5fd 0%, #1d4ed8 44%, #020617 84%);
+  opacity:.42;
+  animation-delay:-16s;
+}
+.planet-g{
+  width:72px;height:72px;right:4%;bottom:16%;
+  background:
+    radial-gradient(circle at 30% 26%, rgba(255,255,255,.76), transparent 12%),
+    radial-gradient(circle at 42% 42%, #fdba74 0%, #ea580c 42%, #312e81 84%);
+  opacity:.34;
+  animation-delay:-12s;
+}
+.planet-h{
+  width:22px;height:22px;left:68%;top:30%;
+  background:
+    radial-gradient(circle at 32% 28%, rgba(255,255,255,.85), transparent 14%),
+    radial-gradient(circle at 42% 42%, #fef3c7 0%, #f59e0b 46%, #020617 84%);
+  opacity:.48;
+  animation-delay:-20s;
+}
+.orbit-c{width:220px;height:64px;right:8%;bottom:15%;animation-delay:-10s;opacity:.22}
+.orbit-d{width:180px;height:54px;left:18%;top:24%;animation-delay:-13s;opacity:.20}
+@media(max-width:1050px){
+  .planet-e,.planet-f,.planet-h,.orbit-c,.orbit-d{display:none}
+  .title-main{font-size:clamp(28px,7vw,42px)}
+  .title-sub{font-size:clamp(18px,5vw,28px)}
+}
+
 @media(max-width:1050px){.controls,.grid-main,.grid-two,.kpis{grid-template-columns:1fr}.badge{display:none}.chartbox,.chartbox.tall{height:320px}}
 </style>
 </head>
 <body>
+<div class="nebula" aria-hidden="true"></div>
+<div class="cosmic-objects" aria-hidden="true">
+  <span class="planet planet-a"><i></i></span>
+  <span class="planet planet-b"><i></i></span>
+  <span class="planet planet-c"><i></i></span>
+  <span class="planet planet-d"><i></i></span>
+  <span class="planet planet-e"><i></i></span>
+  <span class="planet planet-f"><i></i></span>
+  <span class="planet planet-g"><i></i></span>
+  <span class="planet planet-h"><i></i></span>
+  <span class="orbit orbit-a"></span>
+  <span class="orbit orbit-b"></span>
+  <span class="orbit orbit-c"></span>
+  <span class="orbit orbit-d"></span>
+</div>
 <div class="wrap">
   <section class="hero">
     <div>
-      <h1>THE 大學影響力排名 (台灣)</h1>
-      <p class="subtitle">2019–2026 臺灣大專校院 Impact Rankings 分析平台</p>
+      <h1><span class="title-main">台灣大專校院 THE Impact Rankings 追蹤平台</span><span class="title-sub">2019-2026區間</span></h1>
     </div>
-    <div class="badge">GitHub Pages 穩定版｜資料格式：data.json</div>
   </section>
 
   <section class="panel controls">
     <div><label>學校</label><select id="schoolSelect"></select></div>
     <div><label>基準年度</label><select id="baseYearSelect"></select></div>
     <div><label>比較年度</label><select id="compareYearSelect"></select></div>
-    <div><label>年度Top 15 </label><select id="topYearSelect"></select></div>
+    <div><label>Top 15 年度</label><select id="topYearSelect"></select></div>
   </section>
 
   <section class="kpis" id="kpis"></section>
@@ -80,12 +266,12 @@ td.num,th.num{text-align:right}
     <div class="panel">
       <div class="card-title"><h2>選定學校年度趨勢</h2></div>
       <div class="chartbox tall"><canvas id="trendChart"></canvas></div>
-      <div class="note">計算方式：Overall 若為區間，圖表採區間中點；世界排名採排名區間下限；臺灣排名依原始資料欄位呈現。缺漏資料不繪製。</div>
+      <div class="note">計算方式：Overall 若為區間，圖表採「總分中點」，亦即區間上下限平均值；世界排名採排名區間下限；臺灣排名依原始資料欄位呈現。缺漏資料不繪製。</div>
     </div>
     <div class="panel">
       <div class="card-title"><h2>臺灣 Top 15 大學</h2></div>
       <div class="chartbox tall"><canvas id="topChart"></canvas></div>
-      <div class="note">計算方式：依所選年度之臺灣排名由小至大排序，取前 15 名；標籤顯示 Overall 區間中點。</div>
+      <div class="note">計算方式：依所選年度之臺灣排名由小至大排序，取前 15 名；標籤顯示 Overall 的總分中點。</div>
     </div>
   </section>
 
@@ -98,7 +284,7 @@ td.num,th.num{text-align:right}
     <div class="panel">
       <div class="card-title"><h2>基準年度與比較年度差異</h2></div>
       <div class="chartbox"><canvas id="diffChart"></canvas></div>
-      <div class="note">計算方式：差異值 = 基準年度分數中點 − 比較年度分數中點；僅呈現兩年度皆有資料的 SDG。</div>
+      <div class="note">計算方式：差異值 = 基準年度分數中點 − 比較年度分數中點；正值代表基準年度較高，負值代表基準年度較低；僅呈現兩年度皆有資料的 SDG。</div>
     </div>
   </section>
 
@@ -108,7 +294,6 @@ td.num,th.num{text-align:right}
       <input id="searchBox" placeholder="搜尋學校或英文名" style="max-width:320px">
     </div>
     <div class="table-wrap"><table id="dataTable"></table></div>
-    <div class="footer">註：資料表不顯示「資料來源」欄位；圖表採用區間中點作為視覺化數值，原始區間仍保留於表格。</div>
   </section>
 </div>
 
@@ -183,11 +368,19 @@ function updateKpis() {
   const base = findRow(school, baseYear), comp = findRow(school, compareYear);
   const overallDiff = base && comp && base.overall_mid != null && comp.overall_mid != null ? base.overall_mid - comp.overall_mid : null;
   const twDiff = base && comp && base.taiwan_rank != null && comp.taiwan_rank != null ? comp.taiwan_rank - base.taiwan_rank : null;
+
+  const overallText = overallDiff == null ? "—" : `${overallDiff >= 0 ? "增加" : "下降"} ${Math.abs(overallDiff).toFixed(1)} 分`;
+  const rankText = twDiff == null ? "—" : `${twDiff >= 0 ? "進步" : "退步"} ${Math.abs(twDiff)} 名`;
+  const explainText = overallDiff == null && twDiff == null
+    ? "兩年度資料不足，無法比較。"
+    : `${baseYear} 與 ${compareYear} 相比：總分中點${overallText}，臺灣排名${rankText}。`;
+
   document.getElementById("kpis").innerHTML = `
     <div class="kpi"><div class="l">選定學校</div><div class="v" style="font-size:20px">${school}</div></div>
-    <div class="kpi"><div class="l">${baseYear} Overall 中點</div><div class="v">${fmtNum(base?.overall_mid)}</div></div>
+    <div class="kpi"><div class="l">${baseYear} 總分中點</div><div class="v">${fmtNum(base?.overall_mid)}</div></div>
     <div class="kpi"><div class="l">${baseYear} 臺灣排名</div><div class="v">${valueOrDash(base?.taiwan_rank)}</div></div>
-    <div class="kpi"><div class="l">相較 ${compareYear}</div><div class="v">${overallDiff==null?"—":(overallDiff>=0?"+":"")+overallDiff.toFixed(1)} / ${twDiff==null?"—":(twDiff>=0?"+":"")+twDiff}</div></div>
+    <div class="kpi"><div class="l">總分變化</div><div class="v" style="font-size:22px">${overallText}</div></div>
+    <div class="kpi"><div class="l">臺灣排名變化</div><div class="v" style="font-size:22px">${rankText}</div><div class="l" style="margin-top:8px;line-height:1.45">${explainText}</div></div>
   `;
 }
 function updateTrend() {
@@ -198,7 +391,7 @@ function updateTrend() {
   charts.trendChart = new Chart(document.getElementById("trendChart"), {
     type:"line",
     data:{labels,datasets:[
-      {label:"Overall 中點", data:rows.map(r=>r.overall_mid), tension:.28, spanGaps:true},
+      {label:"總分中點", data:rows.map(r=>r.overall_mid), tension:.28, spanGaps:true},
       {label:"臺灣排名", data:rows.map(r=>r.taiwan_rank), tension:.28, spanGaps:true},
       {label:"世界排名下限", data:rows.map(r=>r.world_rank_low), tension:.28, spanGaps:true}
     ]},
@@ -208,12 +401,12 @@ function updateTrend() {
 function updateTop() {
   const {topYear} = getSelected();
   const rows = DATA.records.filter(r=>Number(r["年度"])===topYear && r.taiwan_rank!=null)
-    .sort((a,b)=>a.taiwan_rank-b.taiwan_rank).slice(0,15).reverse();
+    .sort((a,b)=>a.taiwan_rank-b.taiwan_rank).slice(0,15);
   destroyChart("topChart");
   charts.topChart = new Chart(document.getElementById("topChart"), {
     type:"bar",
-    data:{labels:rows.map(r=>r["學校"]),datasets:[{label:"Overall 中點",data:rows.map(r=>r.overall_mid)}]},
-    options:{...chartOptions("Overall 中點"), indexAxis:"y", plugins:{legend:{display:false}, tooltip:{callbacks:{label:(ctx)=>`Overall 中點：${fmtNum(ctx.raw)}；臺灣排名：${rows[ctx.dataIndex].taiwan_rank}`}}}}
+    data:{labels:rows.map(r=>r["學校"]),datasets:[{label:"總分中點",data:rows.map(r=>r.overall_mid)}]},
+    options:{...chartOptions("總分中點"), indexAxis:"y", plugins:{legend:{display:false}, tooltip:{callbacks:{label:(ctx)=>`總分中點：${fmtNum(ctx.raw)}；臺灣排名：${rows[ctx.dataIndex].taiwan_rank}`}}}}
   });
 }
 function updateSdg() {
