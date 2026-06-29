@@ -517,6 +517,36 @@ tr:hover td{
   filter:none !important;
 }
 
+
+/* v25: clearer star clusters, QS placeholder, sortable SDG table columns */
+.starfield-far{
+  opacity:.72 !important;
+  background-image:
+    radial-gradient(rgba(255,255,255,.92) .65px, transparent 1px),
+    radial-gradient(rgba(147,197,253,.88) .55px, transparent .95px),
+    radial-gradient(rgba(196,181,253,.72) .45px, transparent .85px) !important;
+}
+.starfield-mid{
+  opacity:.68 !important;
+  background-image:
+    radial-gradient(rgba(219,234,254,.95) .95px, transparent 1.35px),
+    radial-gradient(rgba(196,181,253,.82) .85px, transparent 1.25px),
+    radial-gradient(rgba(var(--accent-rgb),.78) .75px, transparent 1.2px) !important;
+}
+.starfield-near{opacity:.50 !important;filter:brightness(1.12)}
+.dust{opacity:.34 !important}
+.nebula{opacity:.38 !important}
+.platform-tabs{display:flex;justify-content:center;gap:12px;margin:10px 0 18px;flex-wrap:wrap}
+.tab-btn{border:1px solid rgba(148,163,184,.28);background:rgba(15,23,42,.72);color:#cbd5e1;border-radius:999px;padding:11px 18px;font-weight:800;cursor:pointer;transition:.2s ease}
+.tab-btn.active{color:#fff;background:rgba(148,163,184,.16);border-color:rgba(148,163,184,.42)}
+.tab-btn.disabled{opacity:.55;cursor:not-allowed}
+.table-sort-note{color:#94a3b8;font-size:12px;margin-left:12px;font-weight:500}
+th.sortable{cursor:pointer;user-select:none}
+th.sortable:hover{color:#fff;background:#17223c}
+th.sortable::after{content:" ⇅";color:#94a3b8;font-weight:600}
+th.sortable.sort-asc::after{content:" ▲";color:#f8fafc}
+th.sortable.sort-desc::after{content:" ▼";color:#f8fafc}
+
 </style>
 </head>
 <body>
@@ -549,11 +579,14 @@ tr:hover td{
 <div class="wrap">
   <section class="hero">
     <div>
-      <h1><span class="title-main">台灣大專校院 
-          </span> THE Impact Rankings 追蹤平台</span>
-          <span class="title-sub">2019-2026區間</span></h1>
+      <h1><span class="title-main">台灣大專校院 THE Impact Rankings 追蹤平台</span><span class="title-sub">2019-2026區間</span></h1>
     </div>
   </section>
+
+  <nav class="platform-tabs">
+    <button class="tab-btn active" id="theTab" type="button">THE Impact Rankings</button>
+    <button class="tab-btn disabled" id="qsTab" type="button" title="QS Sustainability Rankings 模組將於下一階段製作">QS Sustainability Rankings</button>
+  </nav>
 
   <section class="panel controls">
     <div><label>學校</label><select id="schoolSelect"></select></div>
@@ -572,12 +605,12 @@ tr:hover td{
         <div class="axis-title axis-title-right">數值／排名</div>
         <div class="chartbox tall trend-canvas-box"><canvas id="trendChart"></canvas></div>
       </div>
-      <div class="note">計算方式：Overall 若為區間，圖表採「總分中點」，亦即區間上下限平均值；世界排名採排名區間下限；排名軸為反向顯示，排名越前面位置越高。</div>
+      <div class="note">計算方式：Overall 若為區間，圖表採「總分中點」，亦即區間上下限平均值；世界排名採排名區間下限；排名軸為反向顯示，排名越前面位置越高。缺漏資料不繪製。</div>
     </div>
     <div class="panel">
       <div class="card-title"><h2>臺灣 Top 15 大學</h2></div>
       <div class="chartbox tall"><canvas id="topChart"></canvas></div>
-      <div class="note">計算方式：依所選年度之臺灣排名由高至低排序，取前 15 名；標籤顯示 Overall 的總分中點。</div>
+      <div class="note">計算方式：依所選年度之臺灣排名由小至大排序，取前 15 名；標籤顯示 Overall 的總分中點。</div>
     </div>
   </section>
 
@@ -596,7 +629,7 @@ tr:hover td{
 
   <section class="panel" style="margin-top:18px">
     <div class="card-title">
-      <h2>各校資料總表</h2>
+      <h2>各校資料總表 <span class="table-sort-note">點擊 SDG 欄位可排序</span></h2>
       <input id="searchBox" placeholder="搜尋學校或英文名" style="max-width:320px">
     </div>
     <div class="table-wrap"><table id="dataTable"></table></div>
@@ -607,6 +640,7 @@ tr:hover td{
 <script>
 let DATA = null;
 let charts = {};
+let tableSort = { key: null, direction: 'desc' };
 
 
 
@@ -981,11 +1015,57 @@ function updateTable() {
   const {baseYear} = getSelected();
   let rows = DATA.records.filter(r=>Number(r["年度"])===baseYear);
   if (q) rows = rows.filter(r=>String(r["學校"]).toLowerCase().includes(q)||String(r["英文名"]).toLowerCase().includes(q));
-  rows = rows.sort((a,b)=>(a.taiwan_rank??9999)-(b.taiwan_rank??9999));
+
+  if (tableSort.key) {
+    const key = tableSort.key;
+    const direction = tableSort.direction === "asc" ? 1 : -1;
+    rows = rows.sort((a,b)=>{
+      const getSortValue = (row, key) => {
+                 if (key.startsWith("SDG")) return row[key + "_mid"];
+                 if (key === "Overall") return row.overall_mid;
+                 if (key === "排名") return row.world_rank_low;
+                 if (key === "臺灣排名") return row.taiwan_rank;
+                 return row[key];
+  };
+
+const av = getSortValue(a, key);
+const bv = getSortValue(b, key);
+      const an = Number(av), bn = Number(bv);
+      if (Number.isFinite(an) && Number.isFinite(bn)) return (an - bn) * direction;
+      return String(av ?? "").localeCompare(String(bv ?? ""), "zh-Hant") * direction;
+    });
+  } else {
+    rows = rows.sort((a,b)=>(a.taiwan_rank??9999)-(b.taiwan_rank??9999));
+  }
+
   const cols = ["年度","臺灣排名","學校","英文名","排名","Overall",...DATA.sdgs];
-  const th = cols.map(c=>`<th class="${["年度","臺灣排名"].includes(c)||c.startsWith("SDG")?"num":""}">${c}</th>`).join("");
+  const th = cols.map(c=>{
+    const isNum = ["年度","臺灣排名"].includes(c)||c.startsWith("SDG");
+    const sortable = c === "臺灣排名" || c === "排名" || c === "Overall" || c.startsWith("SDG");    
+    const cls = [
+      isNum ? "num" : "",
+      sortable ? "sortable" : "",
+      tableSort.key === c ? (tableSort.direction === "asc" ? "sort-asc" : "sort-desc") : ""
+    ].filter(Boolean).join(" ");
+    const attr = sortable ? `data-sort-key="${c}"` : "";
+    return `<th class="${cls}" ${attr}>${c}</th>`;
+  }).join("");
+
   const body = rows.map(r=>`<tr>${cols.map(c=>`<td class="${["年度","臺灣排名"].includes(c)||c.startsWith("SDG")?"num":""}">${valueOrDash(r[c])}</td>`).join("")}</tr>`).join("");
   document.getElementById("dataTable").innerHTML = `<thead><tr>${th}</tr></thead><tbody>${body}</tbody>`;
+
+  document.querySelectorAll("#dataTable th.sortable").forEach(th=>{
+    th.addEventListener("click", ()=>{
+      const key = th.dataset.sortKey;
+      if (tableSort.key === key) {
+        tableSort.direction = tableSort.direction === "desc" ? "asc" : "desc";
+      } else {
+        tableSort.key = key;
+        tableSort.direction = "desc";
+      }
+      updateTable();
+    });
+  });
 }
 let parallaxScheduled = false;
 document.addEventListener("mousemove", (event) => {
@@ -1000,6 +1080,14 @@ document.addEventListener("mousemove", (event) => {
   });
 });
 
+document.addEventListener("DOMContentLoaded", () => {
+  const qsBtn = document.getElementById("qsTab");
+  if (qsBtn) {
+    qsBtn.addEventListener("click", () => {
+      alert("QS Sustainability Rankings 模組將於下一階段製作；目前先完成 THE 版本。");
+    });
+  }
+});
 loadData();
 </script>
 </body>
