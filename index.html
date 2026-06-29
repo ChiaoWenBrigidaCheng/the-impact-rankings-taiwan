@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>台灣大專校院永續排名追蹤平台｜2019-2026區間</title>
+<title>台灣大專校院永續排名追蹤平台｜THE Impact Rankings</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
@@ -547,6 +547,48 @@ th.sortable::after{content:" ⇅";color:#94a3b8;font-weight:600}
 th.sortable.sort-asc::after{content:" ▲";color:#f8fafc}
 th.sortable.sort-desc::after{content:" ▼";color:#f8fafc}
 
+
+/* Final stable release refinements */
+.title-sub{
+  font-size:clamp(14px,1.8vw,22px) !important;
+  letter-spacing:.08em !important;
+  margin-top:8px !important;
+}
+.tab-btn{
+  padding:14px 26px !important;
+  font-size:16px !important;
+  min-width:220px;
+}
+.nkust-marker{
+  display:none !important;
+}
+.site-footer{
+  margin-top:40px;
+  padding:32px 20px 24px;
+  text-align:center;
+  border-top:1px solid rgba(255,255,255,.12);
+}
+.site-footer .developed,
+.site-footer .footer-brand{
+  font-size:12px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  color:#64748b;
+  margin-bottom:10px;
+}
+.site-footer .unit,
+.site-footer .footer-unit{
+  font-size:17px;
+  font-weight:600;
+  color:#e2e8f0;
+  margin-bottom:10px;
+}
+.site-footer .version,
+.site-footer .footer-version{
+  font-size:12px;
+  color:#64748b;
+}
+
 </style>
 </head>
 <body>
@@ -579,7 +621,7 @@ th.sortable.sort-desc::after{content:" ▼";color:#f8fafc}
 <div class="wrap">
   <section class="hero">
     <div>
-      <h1><span class="title-main">台灣大專校院永續排名追蹤平台</span><span class="title-sub">2019-2026區間</span></h1>
+      <h1><span class="title-main">台灣大專校院永續排名追蹤平台</span><span class="title-sub">2019–2026區間</span></h1>
     </div>
   </section>
 
@@ -629,7 +671,7 @@ th.sortable.sort-desc::after{content:" ▼";color:#f8fafc}
 
   <section class="panel" style="margin-top:18px">
     <div class="card-title">
-      <h2>各校資料總表 <span class="table-sort-note">點擊 SDG 欄位可排序</span></h2>
+      <h2 id="tableHeading">各校資料總表 <span class="table-sort-note">點擊臺灣排名、排名、Overall 或 SDG 欄位可排序</span></h2>
       <input id="searchBox" placeholder="搜尋學校或英文名" style="max-width:320px">
     </div>
     <div class="table-wrap"><table id="dataTable"></table></div>
@@ -743,8 +785,8 @@ function buildPayloadFromExcelRows(rows) {
 
 async function loadData() {
   try {
-    const res = await fetch("the_data.xlsm", {cache: "no-store"});
-    if (!res.ok) throw new Error("data.xlsm not found");
+    const res = await fetch("the_the_data.xlsm", {cache: "no-store"});
+    if (!res.ok) throw new Error("the_data.xlsm not found");
     const buffer = await res.arrayBuffer();
     const workbook = XLSX.read(buffer, {type: "array"});
     const firstSheetName = workbook.SheetNames[0];
@@ -1021,15 +1063,15 @@ function updateTable() {
     const direction = tableSort.direction === "asc" ? 1 : -1;
     rows = rows.sort((a,b)=>{
       const getSortValue = (row, key) => {
-                 if (key.startsWith("SDG")) return row[key + "_mid"];
-                 if (key === "Overall") return row.overall_mid;
-                 if (key === "排名") return row.world_rank_low;
-                 if (key === "臺灣排名") return row.taiwan_rank;
-                 return row[key];
-  };
-
-const av = getSortValue(a, key);
-const bv = getSortValue(b, key);
+        if (key.startsWith("SDG")) return row[key + "_mid"];
+        if (key === "Overall") return row.overall_mid;
+        if (key === "排名") return row.world_rank_low;
+        if (key === "臺灣排名") return row.taiwan_rank;
+        if (key === "年度") return Number(row["年度"]);
+        return row[key];
+      };
+      const av = getSortValue(a, key);
+      const bv = getSortValue(b, key);
       const an = Number(av), bn = Number(bv);
       if (Number.isFinite(an) && Number.isFinite(bn)) return (an - bn) * direction;
       return String(av ?? "").localeCompare(String(bv ?? ""), "zh-Hant") * direction;
@@ -1038,10 +1080,16 @@ const bv = getSortValue(b, key);
     rows = rows.sort((a,b)=>(a.taiwan_rank??9999)-(b.taiwan_rank??9999));
   }
 
-  const cols = ["年度","臺灣排名","學校","英文名","排名","Overall",...DATA.sdgs];
+  const heading = document.getElementById("tableHeading");
+  if (heading) {
+    heading.innerHTML = `各校資料總表（共 ${rows.length} 所大專校院） <span class="table-sort-note">點擊臺灣排名、排名、Overall 或 SDG 欄位可排序</span>`;
+  }
+
+  const cols = ["No.","年度","臺灣排名","學校","英文名","排名","Overall",...DATA.sdgs];
+  const sortableKeys = new Set(["年度","臺灣排名","排名","Overall",...DATA.sdgs]);
   const th = cols.map(c=>{
-    const isNum = ["年度","臺灣排名"].includes(c)||c.startsWith("SDG");
-    const sortable = c === "臺灣排名" || c === "排名" || c === "Overall" || c.startsWith("SDG");    
+    const isNum = ["No.","年度","臺灣排名"].includes(c)||c.startsWith("SDG");
+    const sortable = sortableKeys.has(c);
     const cls = [
       isNum ? "num" : "",
       sortable ? "sortable" : "",
@@ -1051,7 +1099,14 @@ const bv = getSortValue(b, key);
     return `<th class="${cls}" ${attr}>${c}</th>`;
   }).join("");
 
-  const body = rows.map(r=>`<tr>${cols.map(c=>`<td class="${["年度","臺灣排名"].includes(c)||c.startsWith("SDG")?"num":""}">${valueOrDash(r[c])}</td>`).join("")}</tr>`).join("");
+  const body = rows.map((r, idx)=>{
+    const isNkust = r["學校"] === "國立高雄科技大學";
+    return `<tr class="${isNkust ? "nkust-row" : ""}">${cols.map(c=>{
+      const value = c === "No." ? idx + 1 : valueOrDash(r[c]);
+      return `<td class="${["No.","年度","臺灣排名"].includes(c)||c.startsWith("SDG")?"num":""}">${value}</td>`;
+    }).join("")}</tr>`;
+  }).join("");
+
   document.getElementById("dataTable").innerHTML = `<thead><tr>${th}</tr></thead><tbody>${body}</tbody>`;
 
   document.querySelectorAll("#dataTable th.sortable").forEach(th=>{
@@ -1061,7 +1116,7 @@ const bv = getSortValue(b, key);
         tableSort.direction = tableSort.direction === "desc" ? "asc" : "desc";
       } else {
         tableSort.key = key;
-        tableSort.direction = "desc";
+        tableSort.direction = key === "臺灣排名" || key === "排名" || key === "年度" ? "asc" : "desc";
       }
       updateTable();
     });
@@ -1090,5 +1145,12 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 loadData();
 </script>
+
+  <footer class="site-footer">
+    <div class="developed">Developed by</div>
+    <div class="unit">校務大數據分析組</div>
+    <div class="version">Version 1.0 ｜ Last Updated: 2026-06-29</div>
+  </footer>
+
 </body>
 </html>
