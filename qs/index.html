@@ -928,7 +928,7 @@ function updateSocial(){
   destroyChart("socialChart");
   charts.socialChart=new Chart(document.getElementById("socialChart"),{
     type:"bar",
-    data:{labels,datasets:[{label:"Social / Governance",data:labels.map(m=>row?row[m+"_mid"]:null),backgroundColor:colors.map(c=>c+"cc"),borderColor:colors,borderWidth:1}]},
+    data:{labels,datasets:[{label:"Social",data:labels.map(m=>row?row[m+"_mid"]:null),backgroundColor:colors.map(c=>c+"cc"),borderColor:colors,borderWidth:1}]},
     options:{...chartOptions("分數"),indexAxis:"y"}
   });
 }
