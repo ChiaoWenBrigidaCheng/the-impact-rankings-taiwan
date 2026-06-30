@@ -589,6 +589,83 @@ th.sortable.sort-desc::after{content:" ▼";color:#f8fafc}
   color:#64748b;
 }
 
+
+/* Version 2.0 Final: unified lighter star density, faster meteors, solar-system style orbits */
+.starfield-far{
+  opacity:.34 !important;
+  background-image:
+    radial-gradient(rgba(255,255,255,.62) .45px, transparent .9px),
+    radial-gradient(rgba(147,197,253,.45) .4px, transparent .85px) !important;
+  background-size:72px 72px,118px 118px !important;
+}
+.starfield-mid{
+  opacity:.24 !important;
+  background-image:
+    radial-gradient(rgba(219,234,254,.52) .65px, transparent 1.15px),
+    radial-gradient(rgba(196,181,253,.34) .55px, transparent 1.05px) !important;
+  background-size:150px 150px,230px 230px !important;
+}
+.starfield-near{
+  opacity:.14 !important;
+  background-image:
+    radial-gradient(rgba(255,255,255,.60) .8px, transparent 1.45px) !important;
+  background-size:340px 340px !important;
+}
+.nebula{opacity:.16 !important}
+.meteor-a{animation-duration:12s !important}
+.meteor-b{animation-duration:16s !important;animation-delay:-6s !important}
+.planet-d{
+  width:48px;height:48px;right:20%;top:56%;
+  background:
+    radial-gradient(circle at 30% 25%,rgba(255,255,255,.74),transparent 12%),
+    radial-gradient(circle at 40% 40%,#bae6fd 0%,#0891b2 42%,#083344 84%);
+  opacity:.42;animation-delay:-16s;
+}
+.planet-e{
+  width:30px;height:30px;left:28%;top:24%;
+  background:
+    radial-gradient(circle at 32% 28%,rgba(255,255,255,.78),transparent 14%),
+    radial-gradient(circle at 42% 42%,#fbcfe8 0%,#db2777 46%,#312e81 84%);
+  opacity:.38;animation-delay:-21s;
+}
+.planet-f{
+  width:24px;height:24px;right:36%;bottom:16%;
+  background:
+    radial-gradient(circle at 32% 28%,rgba(255,255,255,.78),transparent 14%),
+    radial-gradient(circle at 42% 42%,#bbf7d0 0%,#22c55e 46%,#052e16 84%);
+  opacity:.38;animation-delay:-25s;
+}
+.orbit{
+  position:absolute;
+  border:1px solid rgba(148,163,184,.18);
+  border-radius:50%;
+  transform:rotate(-18deg);
+  opacity:.28;
+  animation:orbitPulse 16s ease-in-out infinite;
+}
+.orbit-a{width:420px;height:118px;right:-90px;top:116px}
+.orbit-b{width:280px;height:82px;left:-54px;bottom:122px;animation-delay:-7s}
+.orbit-c{width:230px;height:70px;right:12%;top:51%;animation-delay:-10s}
+.orbit-d{width:160px;height:52px;left:22%;top:22%;animation-delay:-4s}
+.orbit-e{width:120px;height:38px;right:31%;bottom:15%;animation-delay:-13s}
+@keyframes orbitPulse{
+  0%,100%{opacity:.14;scale:1}
+  50%{opacity:.38;scale:1.04}
+}
+.tab-btn.active{
+  background:rgba(51,65,85,.88) !important;
+  color:#fff !important;
+  border-color:rgba(226,232,240,.45) !important;
+}
+.site-footer .developed,
+.site-footer .footer-brand,
+.footer .developed{
+  text-transform:uppercase;
+}
+@media(max-width:1050px){
+  .planet-d,.planet-e,.planet-f,.orbit-c,.orbit-d,.orbit-e{display:none}
+}
+
 </style>
 </head>
 <body>
@@ -650,7 +727,7 @@ th.sortable.sort-desc::after{content:" ▼";color:#f8fafc}
       <div class="note">計算方式：Overall 若為區間，圖表採「總分中點」，亦即區間上下限平均值；世界排名採排名區間下限；排名軸為反向顯示，排名越前面位置越高。缺漏資料不繪製。</div>
     </div>
     <div class="panel">
-      <div class="card-title"><h2>臺灣 Top 15 大學</h2></div>
+      <div class="card-title"><h2>臺灣 Top 15 大學 (THE)</h2></div>
       <div class="chartbox tall"><canvas id="topChart"></canvas></div>
       <div class="note">計算方式：依所選年度之臺灣排名由小至大排序，取前 15 名；標籤顯示 Overall 的總分中點。</div>
     </div>
@@ -922,6 +999,7 @@ function init() {
   updateAll();
 }
 function updateAll() {
+  if (typeof updateAutoRangeAndFooter === 'function') updateAutoRangeAndFooter();
   setAccent("#6ee7ff");
   updateKpis(); updateTrend(); updateTop(); updateSdg(); updateDiff(); updateTable();
 }
@@ -1008,7 +1086,7 @@ function updateTop() {
   destroyChart("topChart");
   charts.topChart = new Chart(document.getElementById("topChart"), {
     type:"bar",
-    data:{labels:rows.map(r=>`${r.taiwan_rank}. ${r["學校"]}`),datasets:[{label:"總分中點",data:rows.map(r=>r.overall_mid),backgroundColor:"rgba(var(--accent-rgb),.62)",borderColor:"rgba(255,255,255,.18)",borderWidth:1}]},
+    data:{labels:rows.map(r=>`${r.taiwan_rank}. ${r["學校"]}`),datasets:[{label:"總分中點",data:rows.map(r=>r.overall_mid),backgroundColor:"rgba(216,180,254,.82)",borderColor:"#D8B4FE",borderWidth:1}]},
     options:{...chartOptions("總分中點"), indexAxis:"y", plugins:{legend:{display:false}, tooltip:{callbacks:{label:(ctx)=>`總分中點：${fmtNum(ctx.raw)}；臺灣排名：${rows[ctx.dataIndex].taiwan_rank}`}}}}
   });
 }
@@ -1143,14 +1221,23 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
+function updateAutoRangeAndFooter(){
+  const pad = n => String(n).padStart(2,"0");
+  const d = new Date();
+  const today = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  document.querySelectorAll(".last-updated").forEach(el => el.textContent = today);
+  if (window.DATA && DATA.years && DATA.years.length) {
+    const years = DATA.years.map(Number).filter(Number.isFinite).sort((a,b)=>a-b);
+    const sub = document.querySelector(".title-sub");
+    if (sub && years.length) sub.textContent = `${years[0]}–${years[years.length-1]}區間`;
+  }
+}
+
 loadData();
 </script>
 
-  <footer class="site-footer">
-    <div class="developed">Developed by</div>
-    <div class="unit">校務大數據分析組</div>
-    <div class="version">Version 1.0 ｜ Last Updated: 2026-06-29</div>
-  </footer>
+  <footer class="site-footer"><div class="developed">Powered by</div><div class="unit">校務大數據分析組</div><div class="version">Version 2.0 • Last Updated: <span class="last-updated"></span></div></footer>
 
 </body>
 </html>
