@@ -590,7 +590,7 @@ th.sortable.sort-desc::after{content:" ▼";color:#f8fafc}
 }
 
 
-/* Version 4.3 Final: unified lighter star density, faster meteors, solar-system style orbits */
+/* Version 4.5 Final: unified lighter star density, faster meteors, solar-system style orbits */
 .starfield-far{
   opacity:.34 !important;
   background-image:
@@ -797,6 +797,27 @@ th.sortable.sort-desc::after{content:" ▼";color:#f8fafc}
 }
 #dataTable tr:hover td:nth-child(3){
   background:#17223c !important;
+}
+
+
+/* v4.5: make NKUST clearly visible in THE data table */
+#dataTable tr.nkust-row td,
+#dataTable tr.nkust-highlight td{
+  background:rgba(255,214,112,.16) !important;
+  border-top:1px solid rgba(255,214,112,.48) !important;
+  border-bottom:1px solid rgba(255,214,112,.48) !important;
+  color:#fff7ed !important;
+}
+#dataTable tr.nkust-row td:nth-child(3),
+#dataTable tr.nkust-highlight td:nth-child(3){
+  background:rgba(255,214,112,.24) !important;
+  color:#fff !important;
+  font-weight:900 !important;
+  box-shadow:2px 0 0 rgba(255,214,112,.42), 8px 0 18px rgba(255,214,112,.12) !important;
+}
+#dataTable tr.nkust-row:hover td,
+#dataTable tr.nkust-highlight:hover td{
+  background:rgba(255,214,112,.22) !important;
 }
 
 </style>
@@ -1498,6 +1519,7 @@ function updateTable() {
   }).join("");
 
   document.getElementById("dataTable").innerHTML = `<thead><tr>${th}</tr></thead><tbody>${body}</tbody>`;
+  applyNkustHighlight();
 
   document.querySelectorAll("#dataTable th.sortable").forEach(th=>{
     th.addEventListener("click", ()=>{
@@ -1534,6 +1556,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+
+function applyNkustHighlight(){
+  document.querySelectorAll("#dataTable tbody tr").forEach(tr=>{
+    if(tr.textContent.includes("國立高雄科技大學")) tr.classList.add("nkust-row");
+  });
+}
+
 function updateAutoRangeAndFooter(){
   const pad = n => String(n).padStart(2,"0");
   const d = new Date();
@@ -1549,7 +1578,7 @@ function updateAutoRangeAndFooter(){
 loadData();
 </script>
 
-  <footer class="site-footer"><div class="developed">Powered by</div><div class="unit">校務大數據分析組</div><div class="version">Version 4.3 • Last Updated: <span class="last-updated"></span></div></footer>
+  <footer class="site-footer"><div class="developed">Powered by</div><div class="unit">校務大數據分析組</div><div class="version">Version 4.5 • Last Updated: <span class="last-updated"></span></div></footer>
 
 </body>
 </html>
