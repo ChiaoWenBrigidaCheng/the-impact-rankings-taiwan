@@ -590,7 +590,7 @@ th.sortable.sort-desc::after{content:" ▼";color:#f8fafc}
 }
 
 
-/* Version 4.7 Final: unified lighter star density, faster meteors, solar-system style orbits */
+/* Version Final Final: unified lighter star density, faster meteors, solar-system style orbits */
 .starfield-far{
   opacity:.34 !important;
   background-image:
@@ -786,45 +786,56 @@ th.sortable.sort-desc::after{content:" ▼";color:#f8fafc}
   border-bottom:1px solid rgba(255,214,112,.48) !important;
   color:#fff7ed !important;
 }
-#dataTable tr.nkust-row td:nth-child(3),
-#dataTable tr.nkust-highlight td:nth-child(3){
-  background:rgba(255,214,112,.24) !important;
-  color:#fff !important;
-  font-weight:900 !important;
-  box-shadow:2px 0 0 rgba(255,214,112,.42), 8px 0 18px rgba(255,214,112,.12) !important;
-}
 #dataTable tr.nkust-row:hover td,
 #dataTable tr.nkust-highlight:hover td{
   background:rgba(255,214,112,.22) !important;
 }
 
 
-/* v4.7: freeze SCHOOL column in THE data table */
-#dataTable th:nth-child(3),
-#dataTable td:nth-child(3){
-  position:sticky;
-  left:0;
-  z-index:4;
-  background:#101a31;
-  box-shadow:2px 0 0 rgba(148,163,184,.20), 8px 0 18px rgba(0,0,0,.18);
+
+/* FINAL: freeze the real SCHOOL column by class, not by column number */
+#dataTable th.school-col,
+#dataTable td.school-col{
+  position:sticky !important;
+  left:0 !important;
+  z-index:8 !important;
+  background:#101a31 !important;
+  box-shadow:2px 0 0 rgba(148,163,184,.22), 10px 0 20px rgba(0,0,0,.20) !important;
 }
-#dataTable td:nth-child(3){
-  background:rgba(15,23,42,.98);
-  color:#f8fafc;
-  font-weight:800;
+#dataTable td.school-col{
+  background:rgba(15,23,42,.98) !important;
+  color:#f8fafc !important;
+  font-weight:800 !important;
 }
-#dataTable th:nth-child(3){
-  z-index:7;
+#dataTable th.school-col{
+  z-index:12 !important;
 }
-#dataTable tr:hover td:nth-child(3){
+#dataTable tr:hover td.school-col{
   background:#17223c !important;
 }
-#dataTable tr.nkust-row td:nth-child(3),
-#dataTable tr.nkust-highlight td:nth-child(3){
-  background:rgba(255,214,112,.24) !important;
+#dataTable tr.nkust-row td{
+  background:rgba(255,214,112,.15) !important;
+  border-top:1px solid rgba(255,214,112,.42) !important;
+  border-bottom:1px solid rgba(255,214,112,.42) !important;
+}
+#dataTable tr.nkust-row td.school-col{
+  background:rgba(255,214,112,.28) !important;
   color:#fff !important;
   font-weight:900 !important;
-  box-shadow:2px 0 0 rgba(255,214,112,.42), 8px 0 18px rgba(255,214,112,.12) !important;
+  box-shadow:2px 0 0 rgba(255,214,112,.52), 10px 0 20px rgba(255,214,112,.14) !important;
+}
+
+
+/* FINAL: identical year-range subtitle size across THE and QS */
+.title-sub{
+  display:block !important;
+  margin-top:8px !important;
+  font-size:clamp(14px, 1.55vw, 20px) !important;
+  font-weight:600 !important;
+  letter-spacing:.08em !important;
+  color:#cbd5e1 !important;
+  text-shadow:none !important;
+  line-height:1.25 !important;
 }
 
 </style>
@@ -1526,6 +1537,7 @@ function updateTable() {
   }).join("");
 
   document.getElementById("dataTable").innerHTML = `<thead><tr>${th}</tr></thead><tbody>${body}</tbody>`;
+  applyTableEnhancements();
   applyNkustHighlight();
 
   document.querySelectorAll("#dataTable th.sortable").forEach(th=>{
@@ -1570,6 +1582,26 @@ function applyNkustHighlight(){
   });
 }
 
+
+function applyTableEnhancements(){
+  const table = document.getElementById("dataTable");
+  if(!table) return;
+  const headers = Array.from(table.querySelectorAll("thead th"));
+  const schoolIndex = headers.findIndex(th => th.textContent.trim().startsWith("學校"));
+  if(schoolIndex >= 0){
+    headers[schoolIndex].classList.add("school-col");
+    table.querySelectorAll("tbody tr").forEach(tr=>{
+      const cells = Array.from(tr.children);
+      if(cells[schoolIndex]){
+        cells[schoolIndex].classList.add("school-col");
+        if(cells[schoolIndex].textContent.trim() === "國立高雄科技大學"){
+          tr.classList.add("nkust-row");
+        }
+      }
+    });
+  }
+}
+
 function updateAutoRangeAndFooter(){
   const pad = n => String(n).padStart(2,"0");
   const d = new Date();
@@ -1585,7 +1617,7 @@ function updateAutoRangeAndFooter(){
 loadData();
 </script>
 
-  <footer class="site-footer"><div class="developed">Powered by</div><div class="unit">校務大數據分析組</div><div class="version">Version 4.7 • Last Updated: <span class="last-updated"></span></div></footer>
+  <footer class="site-footer"><div class="developed">Powered by</div><div class="unit">校務大數據分析組</div><div class="version">Version Final • Last Updated: <span class="last-updated"></span></div></footer>
 
 </body>
 </html>
