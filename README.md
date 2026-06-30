@@ -1,6 +1,6 @@
-# 臺灣大專校院永續排名追蹤平台｜Version 3.0 Final
+# 臺灣大專校院永續排名追蹤平台｜Version 4.1 Final
 
-GitHub Pages 標準結構：
+這是重新整理後的 GitHub Pages 發布包，使用固定且乾淨的標準結構。
 
 ```text
 /
@@ -13,17 +13,20 @@ GitHub Pages 標準結構：
     └── qs_data.xlsm
 ```
 
-## 頁面路徑
+## 正式網址
 
-- Portal：`/`
-- THE：`/the/`
-- QS：`/qs/`
+- Portal：`https://<帳號>.github.io/<repository>/`
+- THE：`https://<帳號>.github.io/<repository>/the/index.html`
+- QS：`https://<帳號>.github.io/<repository>/qs/index.html`
 
-## 維護方式
+## 更新資料
 
-更新資料時，請直接覆蓋：
-
+請直接覆蓋：
 - `the/the_data.xlsm`
 - `qs/qs_data.xlsm`
 
-請維持檔名不變。
+請不要改檔名。
+
+## v4.1 更新
+
+- THE 與 QS 的各校資料總表新增「學校」欄位凍結效果，水平瀏覽後方欄位時仍可看到學校名稱。
