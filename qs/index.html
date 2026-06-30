@@ -537,6 +537,43 @@ th.sortable.sort-desc::after{content:" ▼";color:#f8fafc}
   background:#17223c !important;
 }
 
+/* QS: reduce star density, keep planets/orbits */
+.starfield-far{
+  opacity:.18 !important;
+  background-size:120px 120px,180px 180px !important;
+}
+
+.starfield-mid{
+  opacity:.10 !important;
+  background-size:240px 240px,360px 360px !important;
+}
+
+.starfield-near{
+  opacity:.06 !important;
+  background-size:520px 520px !important;
+}
+
+.dust,
+.dust-b,
+.glow-star{
+  opacity:.08 !important;
+}
+
+.comet,
+.meteor{
+  opacity:.35;
+}
+
+/* QS: subtitle size same as THE */
+.title-sub{
+  font-size:clamp(14px, 1.8vw, 22px) !important;
+  font-weight:600 !important;
+  letter-spacing:.08em !important;
+  margin-top:8px !important;
+  color:#cbd5e1 !important;
+  text-shadow:none !important;
+}
+
 </style>
 </head>
 <body>
