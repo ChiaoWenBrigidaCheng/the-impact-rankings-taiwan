@@ -1,4 +1,4 @@
-# 台灣大專校院永續排名追蹤平台
+# 臺灣大專校院永續排名追蹤平台
 
 THE Impact Rankings｜Version 1.0
 
