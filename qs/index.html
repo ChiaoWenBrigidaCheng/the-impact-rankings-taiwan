@@ -122,16 +122,20 @@ body::after{
 .wrap{width:min(1560px,94vw);margin:0 auto;padding:28px 0 48px;position:relative;z-index:3}
 .hero{display:flex;justify-content:center;align-items:center;margin:8px 0 22px;text-align:center}
 h1{font-size:clamp(30px,4.6vw,62px);line-height:1.1;margin:0;font-weight:900;letter-spacing:.015em;color:#f8fafc}
-.title-main{display:block}
-.title-sub{
-    display:block;
-    margin-top:8px;
-    font-size:clamp(1rem, 1.3vw, 1.4rem);
-    font-weight:700;
-    color:#dbeafe;
-    letter-spacing:.08em;
+.title-main{
+  display:block;
+  font-size:clamp(30px,4.6vw,62px);
+  line-height:1.12;
 }
-.platform-tabs{display:flex;justify-content:center;gap:12px;margin:10px 0 18px;flex-wrap:wrap}
+.title-sub{
+  display:block;
+  margin-top:8px;
+  font-size:clamp(20px,3vw,40px);
+  letter-spacing:.12em;
+  color:#c7d2fe;
+  text-shadow:0 0 16px rgba(167,139,250,.38),0 0 30px rgba(var(--accent-rgb),.18);
+}
+}.platform-tabs{display:flex;justify-content:center;gap:12px;margin:10px 0 18px;flex-wrap:wrap}
 .tab-btn{
   display:inline-flex;
   align-items:center;
