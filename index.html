@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>臺灣大專校院永續排名追蹤平台</title>
+  <style>
+    :root{--bg:#050814;--line:rgba(148,163,184,.25);--text:#f8fafc;--muted:#b7c3d8;--accent:#6ee7ff;--accent-rgb:110,231,255}
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;font-family:"Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;background:var(--bg);color:var(--text)}
+    body::before{content:"";position:fixed;inset:0;z-index:-4;background:radial-gradient(circle at 20% 12%, rgba(59,130,246,.18), transparent 28%),radial-gradient(circle at 78% 10%, rgba(168,85,247,.16), transparent 24%),radial-gradient(circle at 70% 78%, rgba(45,212,191,.10), transparent 30%),linear-gradient(180deg,#020617 0%,#071226 42%,#030712 100%)}
+    body::after{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(circle at center, transparent 0%, rgba(0,0,0,.18) 72%, rgba(0,0,0,.42) 100%)}
+    .space-effects{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:1}
+    .starfield{position:absolute;inset:-20%;background-repeat:repeat;animation:starDrift 90s linear infinite}
+    .starfield-far{background-image:radial-gradient(rgba(255,255,255,.76) .5px, transparent .95px),radial-gradient(rgba(147,197,253,.58) .45px, transparent .9px);background-size:52px 52px,86px 86px;opacity:.46}
+    .starfield-mid{background-image:radial-gradient(rgba(219,234,254,.72) .75px, transparent 1.25px),radial-gradient(rgba(196,181,253,.48) .65px, transparent 1.15px);background-size:112px 112px,178px 178px;opacity:.38;animation-duration:120s}
+    .starfield-near{background-image:radial-gradient(rgba(255,255,255,.74) .9px, transparent 1.55px);background-size:260px 260px;opacity:.22;animation:starDrift 150s linear infinite, starTwinkle 5s ease-in-out infinite alternate}
+    @keyframes starDrift{from{transform:translate3d(0,0,0)}to{transform:translate3d(-120px,72px,0)}} @keyframes starTwinkle{0%{opacity:.18;filter:brightness(.9)}50%{opacity:.36;filter:brightness(1.2)}100%{opacity:.24;filter:brightness(1)}}
+    .nebula{position:absolute;width:70vw;height:70vw;border-radius:50%;filter:blur(46px);opacity:.20;mix-blend-mode:screen;animation:nebulaFlow 38s ease-in-out infinite alternate}
+    .nebula-blue{left:-18vw;top:-18vw;background:radial-gradient(circle, rgba(59,130,246,.28), rgba(59,130,246,.07) 42%, transparent 70%)} .nebula-purple{right:-20vw;top:-24vw;background:radial-gradient(circle, rgba(168,85,247,.28), rgba(168,85,247,.07) 44%, transparent 72%);animation-delay:-12s} .nebula-teal{right:8vw;bottom:-30vw;background:radial-gradient(circle, rgba(45,212,191,.22), rgba(45,212,191,.06) 42%, transparent 70%);animation-delay:-18s}
+    @keyframes nebulaFlow{0%{transform:translate3d(-2%,0,0) rotate(-2deg) scale(1)}100%{transform:translate3d(4%,2%,0) rotate(5deg) scale(1.06)}}
+    .planet{position:absolute;display:block;border-radius:50%;opacity:.56;filter:drop-shadow(0 0 12px rgba(148,163,184,.14));animation:planetFloat 26s ease-in-out infinite}.planet i{position:absolute;inset:-22%;border-radius:50%;border:1px solid rgba(226,232,240,.22);transform:rotate(-18deg) scaleX(1.55)}
+    .planet-a{width:110px;height:110px;right:5.5%;top:15%;background:radial-gradient(circle at 28% 24%,rgba(255,255,255,.82),transparent 10%),radial-gradient(circle at 34% 35%,#7dd3fc 0%,#2563eb 33%,#1e1b4b 76%);animation-delay:-2s}.planet-b{width:64px;height:64px;left:5.5%;top:66%;background:radial-gradient(circle at 30% 25%,rgba(255,255,255,.74),transparent 12%),radial-gradient(circle at 40% 40%,#fde68a 0%,#d97706 42%,#4c1d95 84%);opacity:.48;animation-delay:-9s}.planet-c{width:36px;height:36px;left:50%;top:13%;background:radial-gradient(circle at 32% 28%,rgba(255,255,255,.80),transparent 14%),radial-gradient(circle at 42% 42%,#c4b5fd 0%,#7c3aed 46%,#111827 84%);opacity:.44;animation-delay:-14s}
+    @keyframes planetFloat{0%,100%{transform:translate3d(0,0,0) rotate(0deg)}35%{transform:translate3d(16px,-16px,0) rotate(3deg)}70%{transform:translate3d(-12px,20px,0) rotate(-2deg)}}
+    .meteor{position:absolute;width:180px;height:2px;border-radius:999px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.82),rgba(var(--accent-rgb),.58),transparent);opacity:0;transform:rotate(-28deg)}.meteor-a{left:72%;top:13%;animation:meteorFly 24s ease-in-out infinite}.meteor-b{left:48%;top:46%;width:120px;animation:meteorFly 38s ease-in-out infinite;animation-delay:-13s}@keyframes meteorFly{0%,84%,100%{opacity:0;transform:translate3d(0,0,0) rotate(-28deg)}88%{opacity:.75}94%{opacity:0;transform:translate3d(-420px,220px,0) rotate(-28deg)}}
+    .wrap{width:min(1180px,92vw);min-height:100vh;margin:0 auto;padding:46px 0 42px;position:relative;z-index:3;display:flex;flex-direction:column;justify-content:center}.hero{text-align:center;margin-bottom:28px}h1{font-size:clamp(34px,5vw,68px);line-height:1.1;margin:0;font-weight:900;letter-spacing:.015em;color:#f8fafc}.subtitle{margin-top:14px;color:#cbd5e1;font-size:clamp(15px,2vw,22px);letter-spacing:.08em;font-weight:600}
+    .portal-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:26px}.portal-card{min-height:260px;padding:28px;border-radius:26px;border:1px solid rgba(148,163,184,.24);background:linear-gradient(180deg,rgba(15,23,42,.90),rgba(8,13,28,.94));box-shadow:0 14px 32px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.04);backdrop-filter:blur(8px);text-decoration:none;color:#f8fafc;display:flex;flex-direction:column;justify-content:space-between;transition:.22s ease}.portal-card:hover{transform:translateY(-4px);border-color:rgba(110,231,255,.44);box-shadow:0 18px 40px rgba(0,0,0,.32)}
+    .tag{display:inline-flex;width:max-content;border:1px solid rgba(148,163,184,.28);border-radius:999px;padding:7px 12px;color:#cbd5e1;font-size:12px;font-weight:800;letter-spacing:.08em}.portal-card h2{font-size:clamp(26px,3vw,38px);line-height:1.1;margin:22px 0 12px}.portal-card p{margin:0;color:#b7c3d8;line-height:1.65;font-size:15px}.enter{margin-top:28px;color:#e0f2fe;font-weight:900;letter-spacing:.08em}
+    .footer{margin-top:40px;text-align:center;border-top:1px solid rgba(255,255,255,.12);padding-top:26px}.footer .developed{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#64748b;margin-bottom:10px}.footer .unit{font-size:17px;font-weight:600;color:#e2e8f0;margin-bottom:10px}.footer .version{font-size:12px;color:#64748b}
+    @media(max-width:850px){.portal-grid{grid-template-columns:1fr}.planet-b,.meteor{display:none}.wrap{justify-content:flex-start}}
+  </style>
+</head>
+<body>
+  <div class="space-effects" aria-hidden="true">
+    <div class="nebula nebula-blue"></div><div class="nebula nebula-purple"></div><div class="nebula nebula-teal"></div>
+    <div class="starfield starfield-far"></div><div class="starfield starfield-mid"></div><div class="starfield starfield-near"></div>
+    <span class="meteor meteor-a"></span><span class="meteor meteor-b"></span>
+    <span class="planet planet-a"><i></i></span><span class="planet planet-b"><i></i></span><span class="planet planet-c"><i></i></span>
+  </div>
+  <main class="wrap">
+    <section class="hero">
+      <h1>臺灣大專校院永續排名追蹤平台</h1>
+      <div class="subtitle">University Sustainability Rankings Analytics Platform</div>
+    </section>
+    <section class="portal-grid" aria-label="選擇排名系統">
+      <a class="portal-card" href="./the/"><div><span class="tag">THE Impact Rankings</span><h2>THE 大學影響力排名</h2><p>以聯合國永續發展目標（SDGs）為核心，追蹤臺灣大專校院於 2019–2026 區間的排名、總分中點與 SDG 表現。</p></div><div class="enter">進入 THE 分析平台 →</div></a>
+      <a class="portal-card" href="./qs/"><div><span class="tag">QS Sustainability Rankings</span><h2>QS 世界大學永續排名</h2><p>以 Environment、Social、Governance 三大構面為核心，分析臺灣大專校院於 2023–2026 區間的永續排名與指標表現。</p></div><div class="enter">進入 QS 分析平台 →</div></a>
+    </section>
+    <footer class="footer"><div class="developed">Developed by</div><div class="unit">校務大數據分析組</div><div class="version">Version 1.0 ｜ Last Updated: 2026-06-29</div></footer>
+  </main>
+</body>
+</html>
