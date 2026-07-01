@@ -847,6 +847,24 @@ body::after{
   .controls{grid-template-columns:1fr !important}
 }
 
+
+/* QS Top chart: show available schools if fewer than 15 */
+.chart-empty{
+  position:absolute;
+  inset:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  color:#cbd5e1;
+  border:1px dashed rgba(148,163,184,.34);
+  border-radius:16px;
+  background:rgba(15,23,42,.70);
+  padding:18px;
+  font-size:13px;
+  line-height:1.6;
+}
+
 </style>
 </head>
 <body>
@@ -917,12 +935,12 @@ body::after{
 
       <div class="panel">
         <div class="card-title">
-          <h2>臺灣 Top 15 大學 (QS)</h2>
+          <h2 id="topChartTitle">臺灣 Top 15 大學 (QS)</h2>
         </div>
         <div class="chartbox tall">
           <canvas id="topChart"></canvas>
         </div>
-        <div class="note">依所選年度之臺灣排名由小至大排序，長條顯示目前選定的 QS 指標分數。</div>
+        <div class="note">依所選年度之臺灣排名由小至大排序；若該年度資料少於 15 所，則顯示該年度已收錄的所有學校。</div>
       </div>
     </section>
 
@@ -1230,9 +1248,29 @@ function updateTrend(){
 
 function updateTop(){
   const {baseYear,metric}=getSelected();
-  const rows=DATA.records.filter(r=>Number(r["年度"])===baseYear&&r.taiwan_rank!=null).sort((a,b)=>a.taiwan_rank-b.taiwan_rank).slice(0,15);
+  const allRows=DATA.records
+    .filter(r=>Number(r["年度"])===baseYear&&r.taiwan_rank!=null)
+    .sort((a,b)=>a.taiwan_rank-b.taiwan_rank);
+
+  // 2023 目前資料只有 11 所；不是不顯示 Top 15，而是顯示該年度已收錄的全部學校。
+  const rows=allRows.slice(0,15);
   const label=metricLabel(metric);
+  const title=document.getElementById("topChartTitle");
+  if(title) title.textContent=`臺灣 Top ${rows.length} 大學 (QS)`;
+
   destroyChart("topChart");
+
+  if(!rows.length){
+    const canvas=document.getElementById("topChart");
+    const box=canvas?.parentElement;
+    if(box && !box.querySelector(".chart-empty")){
+      box.insertAdjacentHTML("beforeend",`<div class="chart-empty">此年度尚無可顯示的臺灣排名資料。</div>`);
+    }
+    return;
+  }
+
+  document.querySelectorAll(".chart-empty").forEach(el=>el.remove());
+
   charts.topChart=new Chart(document.getElementById("topChart"),{
     type:"bar",
     data:{labels:rows.map(r=>`${r.taiwan_rank}. ${r["學校"]}`),datasets:[{label:label,data:rows.map(r=>metricScore(r,metric)),backgroundColor:"rgba(255,214,112,.86)",borderColor:"#FFD670",borderWidth:1}]},
