@@ -594,6 +594,14 @@ th.sortable.sort-desc::after{content:" ▼";color:#f8fafc}
 /* THE final fix: Top 15 follows base year */
 .controls{grid-template-columns:2fr 1fr 1fr !important}
 @media(max-width:1050px){.controls{grid-template-columns:1fr !important}}
+
+/* THE Excel final fix */
+.controls{grid-template-columns:2fr 1fr 1fr !important}
+@media(max-width:1050px){.controls{grid-template-columns:1fr !important}}
+
+/* THE robust Excel loader final */
+.controls{grid-template-columns:2fr 1fr 1fr !important}
+@media(max-width:1050px){.controls{grid-template-columns:1fr !important}}
 </style>
 </head>
 <body>
@@ -953,26 +961,104 @@ function buildPayloadFromExcelRows(rows) {
   return {records, years, schools, sdgs};
 }
 
-async function loadData() {
-  try {
-    const res = await fetch("the_data.xlsm", {cache: "no-store"});
-    if (!res.ok) throw new Error("the_the_data.xlsm not found");
-    const buffer = await res.arrayBuffer();
-    const workbook = XLSX.read(buffer, {type: "array"});
-    const firstSheetName = workbook.SheetNames[0];
-    const worksheet = workbook.Sheets[firstSheetName];
-    const rows = XLSX.utils.sheet_to_json(worksheet, {defval: ""});
-    DATA = buildPayloadFromExcelRows(rows);
-  } catch (excelError) {
-    try {
-      const res = await fetch("data.json", {cache:"no-store"});
-      if (!res.ok) throw new Error("data.json not found");
-      DATA = await res.json();
-    } catch(jsonError) {
-      DATA = JSON.parse(document.getElementById("embedded-data").textContent);
+async function loadWorkbookRows(fileName){
+  const url = `${fileName}?v=${Date.now()}`;
+  const res = await fetch(url, {cache:"no-store"});
+  if(!res.ok) throw new Error(`${fileName} HTTP ${res.status}`);
+  const buf = await res.arrayBuffer();
+  if(!buf || buf.byteLength === 0) throw new Error(`${fileName} is empty`);
+
+  const wb = XLSX.read(buf, {type:"array", cellDates:false, cellText:false});
+  if(!wb || !wb.SheetNames || wb.SheetNames.length === 0) throw new Error(`${fileName} has no worksheets`);
+
+  const preferred = ["各校資料總表","Sheet1","工作表1","THE","Data","data"];
+  let sheetName = preferred.find(n => wb.SheetNames.includes(n)) || wb.SheetNames[0];
+  let ws = wb.Sheets[sheetName];
+
+  let rows = XLSX.utils.sheet_to_json(ws, {defval:"", raw:false});
+
+  // If first worksheet is empty, try every sheet and use the first readable one.
+  if(!rows || rows.length === 0){
+    for(const name of wb.SheetNames){
+      const candidate = XLSX.utils.sheet_to_json(wb.Sheets[name], {defval:"", raw:false});
+      if(candidate && candidate.length > 0){
+        sheetName = name;
+        rows = candidate;
+        break;
+      }
     }
   }
-  init();
+
+  if(!rows || rows.length === 0) throw new Error(`${fileName} has no readable rows`);
+  console.info(`Loaded ${rows.length} rows from ${fileName} / ${sheetName}`);
+  return rows;
+}
+
+async function loadData(){
+  const statusHtml = (msg, tone="info") => {
+    const wrap = document.querySelector(".wrap");
+    if(!wrap) return;
+    let box = document.getElementById("dataStatusBox");
+    if(!box){
+      box = document.createElement("div");
+      box.id = "dataStatusBox";
+      box.className = "panel";
+      box.style.marginBottom = "16px";
+      box.style.fontSize = "13px";
+      box.style.lineHeight = "1.6";
+      wrap.insertBefore(box, wrap.firstChild);
+    }
+    const color = tone==="error" ? "#fecaca" : tone==="warn" ? "#fde68a" : "#cbd5e1";
+    const border = tone==="error" ? "#ef4444" : tone==="warn" ? "#f59e0b" : "rgba(148,163,184,.25)";
+    box.style.color = color;
+    box.style.borderColor = border;
+    box.innerHTML = msg;
+  };
+
+  let excelErr = null;
+
+  // 1) Try Excel first
+  try{
+    if(typeof XLSX === "undefined") throw new Error("XLSX library is not loaded");
+    const rows = await loadWorkbookRows("the_data.xlsm");
+    DATA = normalizeRows(rows);
+    if(!DATA || !DATA.records || DATA.records.length === 0) throw new Error("normalizeRows returned no records");
+    console.info("THE data source: Excel", DATA.records.length);
+    init();
+    // Hide status if successful.
+    const box = document.getElementById("dataStatusBox");
+    if(box) box.remove();
+    return;
+  }catch(err){
+    excelErr = err;
+    console.warn("Excel loading failed; trying embedded data.", err);
+  }
+
+  // 2) Fallback to embedded JSON
+  try{
+    const embedded = document.getElementById("embedded-data");
+    if(!embedded || !embedded.textContent.trim()) throw new Error("embedded-data not found or empty");
+    const payload = JSON.parse(embedded.textContent);
+    DATA = normalizeRows(payload.records || []);
+    if(!DATA || !DATA.records || DATA.records.length === 0) throw new Error("embedded-data contains no records");
+    console.info("THE data source: embedded-data", DATA.records.length);
+    init();
+    statusHtml(
+      `已使用內嵌資料顯示。Excel 讀取未成功：${excelErr ? excelErr.message : "unknown error"}<br>
+       若要使用 Excel 更新資料，請確認 <b>the/index.html</b> 與 <b>the_data.xlsm</b> 位於同一個資料夾，且檔名完全一致。`,
+      "warn"
+    );
+    return;
+  }catch(embeddedErr){
+    console.error("Both Excel and embedded-data failed.", embeddedErr);
+    statusHtml(
+      `資料讀取失敗。<br>
+       Excel 錯誤：${excelErr ? excelErr.message : "unknown"}<br>
+       內嵌資料錯誤：${embeddedErr.message}<br>
+       請確認檔案位置：<b>the/index.html</b> 與 <b>the_data.xlsm</b> 必須在同一個資料夾。`,
+      "error"
+    );
+  }
 }
 function destroyChart(id) {
   if (charts[id]) { charts[id].destroy(); charts[id] = null; }
@@ -1398,7 +1484,7 @@ function updateAutoRangeAndFooter(){
 loadData();
 </script>
 
-  <footer class="site-footer"><div class="developed">Powered by</div><div class="unit">校務大數據分析組</div><div class="version">Version THE final fixed• Last Updated: <span class="last-updated"></span></div></footer>
+  <footer class="site-footer"><div class="developed">Powered by</div><div class="unit">校務大數據分析組</div><div class="version">Version THE robust Excel• Last Updated: <span class="last-updated"></span></div></footer>
 
 </body>
 </html>
