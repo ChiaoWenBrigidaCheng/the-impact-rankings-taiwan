@@ -20,106 +20,38 @@
   --gov:#a78bfa;
 }
 *{box-sizing:border-box}
-html,body{
-  margin:0;
-  min-height:100%;
-  font-family:"Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
-  background:var(--bg);
-  color:var(--text);
-}
+html,body{margin:0;min-height:100%;font-family:"Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;background:var(--bg);color:var(--text)}
 body::before{
   content:"";
   position:fixed;
   inset:0;
-  z-index:-4;
+  z-index:-3;
   background:
-    radial-gradient(circle at 16% 12%, rgba(34,197,94,.16), transparent 28%),
-    radial-gradient(circle at 78% 10%, rgba(56,189,248,.18), transparent 24%),
-    radial-gradient(circle at 68% 78%, rgba(167,139,250,.13), transparent 30%),
-    linear-gradient(180deg,#020617 0%,#071226 42%,#030712 100%);
+    radial-gradient(circle at 18% 18%, rgba(88,166,255,.26), transparent 28%),
+    radial-gradient(circle at 76% 12%, rgba(168,85,247,.22), transparent 24%),
+    radial-gradient(circle at 68% 78%, rgba(45,212,191,.14), transparent 30%),
+    radial-gradient(circle at 38% 54%, rgba(251,191,36,.08), transparent 24%),
+    linear-gradient(180deg,#030712 0%,#071226 42%,#050816 100%);
 }
 body::after{
   content:"";
   position:fixed;
   inset:0;
   z-index:0;
-  pointer-events:none;
-  background:radial-gradient(circle at center, transparent 0%, rgba(0,0,0,.18) 72%, rgba(0,0,0,.42) 100%);
-}
-.network-bg{
-  position:fixed;
-  inset:0;
-  overflow:hidden;
-  z-index:1;
-  pointer-events:none;
-}
-.grid-glow{
-  position:absolute;
-  inset:-20%;
-  opacity:.18;
+  opacity:.32;
   background-image:
-    linear-gradient(rgba(148,163,184,.18) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(148,163,184,.18) 1px, transparent 1px);
-  background-size:72px 72px;
-  transform:rotate(-8deg);
+    radial-gradient(#ffffff 0.7px, transparent 0.8px),
+    radial-gradient(#93c5fd 0.8px, transparent 0.9px),
+    radial-gradient(#c4b5fd 0.6px, transparent 0.8px);
+  background-size:72px 72px,132px 132px,210px 210px;
+  background-position:0 0,38px 56px,120px 80px;
+  animation:starDrift 46s linear infinite;
 }
-.grid-b{
-  opacity:.10;
-  background-size:118px 118px;
-  transform:rotate(9deg);
-}
-.node-field{
-  position:absolute;
-  inset:-12%;
-  background-image:
-    radial-gradient(rgba(255,255,255,.88) .8px, transparent 1.3px),
-    radial-gradient(rgba(56,189,248,.74) .7px, transparent 1.2px),
-    radial-gradient(rgba(34,197,94,.55) .7px, transparent 1.2px);
-  background-size:44px 44px,78px 78px,126px 126px;
-  opacity:.54;
-  animation:nodeDrift 90s linear infinite;
-}
-.node-field-b{
-  opacity:.28;
-  background-size:64px 64px,112px 112px,180px 180px;
-  animation-duration:140s;
-  animation-direction:reverse;
-}
-@keyframes nodeDrift{
+@keyframes starDrift{
   from{transform:translate3d(0,0,0)}
-  to{transform:translate3d(-120px,72px,0)}
+  to{transform:translate3d(-80px,40px,0)}
 }
-.orb{
-  position:absolute;
-  display:block;
-  border-radius:50%;
-  opacity:.40;
-  filter:blur(.2px);
-}
-.orb-env{
-  width:120px;height:120px;left:5%;top:58%;
-  background:radial-gradient(circle at 32% 30%, rgba(255,255,255,.82), transparent 12%), radial-gradient(circle, #86efac 0%, #16a34a 42%, #052e16 86%);
-  animation:floatOrb 24s ease-in-out infinite;
-}
-.orb-soc{
-  width:94px;height:94px;right:6%;top:16%;
-  background:radial-gradient(circle at 32% 30%, rgba(255,255,255,.82), transparent 12%), radial-gradient(circle, #7dd3fc 0%, #0284c7 42%, #082f49 86%);
-  animation:floatOrb 28s ease-in-out infinite;
-  animation-delay:-7s;
-}
-.orb-gov{
-  width:46px;height:46px;left:48%;top:14%;
-  background:radial-gradient(circle at 32% 30%, rgba(255,255,255,.80), transparent 12%), radial-gradient(circle, #c4b5fd 0%, #7c3aed 42%, #1e1b4b 86%);
-  animation:floatOrb 26s ease-in-out infinite;
-  animation-delay:-12s;
-}
-@keyframes floatOrb{
-  0%,100%{transform:translate3d(0,0,0)}
-  35%{transform:translate3d(14px,-16px,0)}
-  70%{transform:translate3d(-12px,18px,0)}
-}
-
-.wrap{width:min(1560px,94vw);margin:0 auto;padding:28px 0 48px;position:relative;z-index:3}
+.wrap{width:min(1560px,94vw);margin:0 auto;padding:28px 0 48px;position:relative;z-index:2}
 .hero{display:flex;justify-content:center;align-items:center;margin:8px 0 22px;text-align:center}
 h1{font-size:clamp(30px,4.6vw,62px);line-height:1.1;margin:0;font-weight:900;letter-spacing:.015em;color:#f8fafc}
 .title-main{
