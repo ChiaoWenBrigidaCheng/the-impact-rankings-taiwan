@@ -872,7 +872,6 @@ th.sortable.sort-desc::after{content:" ▼";color:#f8fafc}
     <div><label>學校</label><select id="schoolSelect"></select></div>
     <div><label>基準年度</label><select id="baseYearSelect"></select></div>
     <div><label>比較年度</label><select id="compareYearSelect"></select></div>
-    <div><label>Top 15 年度</label><select id="topYearSelect"></select></div>
   </section>
 
   <section class="kpis" id="kpis"></section>
@@ -1301,7 +1300,7 @@ function getSelected() {
     school: document.getElementById("schoolSelect").value,
     baseYear: Number(document.getElementById("baseYearSelect").value),
     compareYear: Number(document.getElementById("compareYearSelect").value),
-    topYear: Number(document.getElementById("topYearSelect").value)
+    topYear: Number(document.getElementById("baseYearSelect").value)
   };
 }
 function findRow(school, year) {
@@ -1311,18 +1310,17 @@ function init() {
   const schoolSel = document.getElementById("schoolSelect");
   const baseSel = document.getElementById("baseYearSelect");
   const compSel = document.getElementById("compareYearSelect");
-  const topSel = document.getElementById("topYearSelect");
+  const topSel = null;
   const defaultSchool = DATA.schools.includes("國立高雄科技大學") ? "國立高雄科技大學" : DATA.schools[0];
   schoolSel.innerHTML = DATA.schools.map(s => `<option value="${s}">${s}</option>`).join("");
   schoolSel.value = defaultSchool;
   const yearsDesc = [...DATA.years].sort((a,b)=>b-a);
-  for (const sel of [baseSel, compSel, topSel]) {
+  for (const sel of [baseSel, compSel]) {
     sel.innerHTML = yearsDesc.map(y => `<option value="${y}">${y}</option>`).join("");
   }
   baseSel.value = yearsDesc[0];
   compSel.value = yearsDesc[1] || yearsDesc[0];
-  topSel.value = yearsDesc[0];
-  [schoolSel,baseSel,compSel,topSel,document.getElementById("searchBox")].forEach(el=>el.addEventListener("input", updateAll));
+  [schoolSel,baseSel,compSel,document.getElementById("searchBox")].forEach(el=>el.addEventListener("input", updateAll));
   updateAll();
 }
 function updateAll() {
