@@ -648,35 +648,62 @@ body::after{
 
 .orbit-e{display:none}
 
-.visual-depth{display:none}
-  
-.dust{opacity:.34 !important}
-
+.visual-depth{
+  position:fixed;
+  inset:0;
+  overflow:hidden;
+  z-index:1;
+  pointer-events:none;
+  transform:translate3d(calc(var(--mx) * 8px), calc(var(--my) * 6px), 0);
+}
+.dust{
+  position:absolute;
+  inset:-12%;
+  opacity:.26;
+  background-image:
+    radial-gradient(rgba(255,255,255,.55) .45px, transparent .7px),
+    radial-gradient(rgba(var(--accent-rgb),.50) .35px, transparent .65px);
+  background-size:18px 18px,31px 31px;
+  animation:dustFloat 120s linear infinite;
+}
 .dust-b{
   opacity:.18;
   background-size:23px 23px,39px 39px;
   animation-duration:170s;
   animation-direction:reverse;
 }
-
+@keyframes dustFloat{
+  from{transform:translate3d(0,0,0)}
+  to{transform:translate3d(-160px,90px,0)}
+}
 .glow-star{
-  box-shadow:0 0 6px rgba(255,255,255,.6) !important;
+  position:absolute;
+  width:4px;
+  height:4px;
+  border-radius:50%;
+  background:#fff;
+  box-shadow:0 0 10px #fff,0 0 22px rgba(var(--accent-rgb),.75);
+  opacity:.66;
+  animation:glowPulse 5.5s ease-in-out infinite;
 }
-
-
 .gs1{left:16%;top:20%;animation-delay:-1s}
-
 .gs2{right:24%;top:26%;animation-delay:-3s}
-
 .gs3{left:38%;bottom:18%;animation-delay:-5s}
-
 .gs4{right:13%;bottom:34%;animation-delay:-7s}
-
-.comet{
-  filter:drop-shadow(0 0 5px rgba(148,163,184,.28)) !important;
+@keyframes glowPulse{
+  0%,100%{opacity:.28;scale:.72}
+  50%{opacity:.95;scale:1.25}
 }
-
-
+.comet{
+  position:absolute;
+  width:240px;
+  height:2px;
+  border-radius:999px;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,.95), rgba(var(--accent-rgb),.78), transparent);
+  opacity:0;
+  filter:drop-shadow(0 0 10px rgba(var(--accent-rgb),.62));
+  transform:rotate(-26deg);
+}
 .comet::after{
   content:"";
   position:absolute;
@@ -688,73 +715,37 @@ body::after{
   background:#fff;
   box-shadow:0 0 14px #fff,0 0 28px rgba(var(--accent-rgb),.78);
 }
-
 .comet-a{left:78%;top:8%;animation:cometSweep 33s ease-in-out infinite}
-
 .comet-b{left:62%;top:38%;width:160px;animation:cometSweep 47s ease-in-out infinite;animation-delay:-18s}
-
 .comet-c{left:92%;top:62%;width:210px;animation:cometSweep 59s ease-in-out infinite;animation-delay:-31s}
-
-.starfield-far{
-  opacity:.34 !important;
-  background-image:
-    radial-gradient(rgba(255,255,255,.62) .45px, transparent .9px),
-    radial-gradient(rgba(147,197,253,.45) .4px, transparent .85px) !important;
-  background-size:72px 72px,118px 118px !important;
-}
-
-.starfield-mid{
-  opacity:.24 !important;
-  background-image:
-    radial-gradient(rgba(219,234,254,.52) .65px, transparent 1.15px),
-    radial-gradient(rgba(196,181,253,.34) .55px, transparent 1.05px) !important;
-  background-size:150px 150px,230px 230px !important;
-}
-
-.starfield-near{
-  opacity:.14 !important;
-  background-image:
-    radial-gradient(rgba(255,255,255,.60) .8px, transparent 1.45px) !important;
-  background-size:340px 340px !important;
-}
-
-.space-effects{transform:none}
-
-@keyframes starDrift{
-  from{transform:translate3d(0,0,0)}
-  to{transform:translate3d(-80px,40px,0)}
-}
-
-@keyframes nebulaFlow{
-  0%{transform:translate3d(-2%,0,0) rotate(-2deg) scale(1)}
-  100%{transform:translate3d(3%,2%,0) rotate(4deg) scale(1.05)}
-}
-
-@keyframes planetFloat{
-  0%,100%{transform:translate3d(0,0,0) rotate(0deg)}
-  35%{transform:translate3d(16px,-16px,0) rotate(3deg)}
-  70%{transform:translate3d(-12px,20px,0) rotate(-2deg)}
-}
-
-@keyframes orbitPulse{
-  0%,100%{opacity:.14;scale:1}
-  50%{opacity:.38;scale:1.04}
-}
-
-@keyframes dustFloat{
-  from{transform:translate3d(0,0,0)}
-  to{transform:translate3d(-160px,90px,0)}
-}
-
-@keyframes glowPulse{
-  0%,100%{opacity:.28;scale:.72}
-  50%{opacity:.95;scale:1.25}
-}
-
 @keyframes cometSweep{
   0%,86%,100%{opacity:0;transform:translate3d(0,0,0) rotate(-26deg)}
   89%{opacity:.96}
   95%{opacity:0;transform:translate3d(-560px,290px,0) rotate(-26deg)}
+}
+.planet{
+  transform:translate3d(calc(var(--mx) * 10px), calc(var(--my) * 8px), 0);
+}
+.planet-a,.planet-g{
+  filter:drop-shadow(0 0 34px rgba(var(--accent-rgb),.30));
+}
+.panel{
+  box-shadow:
+    0 12px 34px rgba(0,0,0,.28),
+    inset 0 1px 0 rgba(var(--accent-rgb),.10),
+    0 0 0 1px rgba(var(--accent-rgb),.04);
+}
+.kpi{
+  transition:border-color .35s ease, box-shadow .35s ease, transform .25s ease;
+}
+.kpi:hover{
+  border-color:rgba(var(--accent-rgb),.40);
+  box-shadow:0 10px 30px rgba(0,0,0,.25),0 0 22px rgba(var(--accent-rgb),.12);
+  transform:translateY(-2px);
+}
+@media(max-width:1050px){
+  .visual-depth{display:none}
+  .space-effects{transform:none}
 }
 
 /* Version Final Final: unified lighter star density, faster meteors, solar-system style orbits */
@@ -876,6 +867,7 @@ body::after{
   <span class="orbit orbit-c"></span>
   <span class="orbit orbit-d"></span>
 </div>
+<div class="wrap">
 
 <main class="wrap">
     <section class="hero">
