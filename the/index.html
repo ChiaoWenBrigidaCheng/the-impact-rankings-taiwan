@@ -590,7 +590,7 @@ th.sortable.sort-desc::after{content:" ▼";color:#f8fafc}
 }
 
 
-/* Version THE no-top-year</style>
+/* Version THE fixed</style>
 </head>
 <body>
 <div class="visual-depth" aria-hidden="true">
@@ -1063,7 +1063,7 @@ function getSelected() {
     school: document.getElementById("schoolSelect").value,
     baseYear: Number(document.getElementById("baseYearSelect").value),
     compareYear: Number(document.getElementById("compareYearSelect").value),
-    topYear:document.getElementById("topYearSelect") ? (document.getElementById("topYearSelect") ? Number(document.getElementById("topYearSelect").value) : Number(document.getElementById("baseYearSelect").value)) : Number(document.getElementById("baseYearSelect").value)
+    topYear:document.getElementById("topYearSelect") ? (document.getElementById("topYearSelect") ? Number(document.getElementById("baseYearSelect").value) : Number(document.getElementById("baseYearSelect").value)) : Number(document.getElementById("baseYearSelect").value)
   };
 }
 function findRow(school, year) {
@@ -1168,15 +1168,43 @@ function updateTrend() {
     options: trendChartOptions()
   });
 }
-function updateTop() {
-  const {topYear} = getSelected();
-  const rows = DATA.records.filter(r=>Number(r["年度"])===topYear && r.taiwan_rank!=null)
-    .sort((a,b)=>a.taiwan_rank-b.taiwan_rank).slice(0,15);
-  destroyChart("topChart");
-  charts.topChart = new Chart(document.getElementById("topChart"), {
+function updateTop(){
+  const {baseYear}=getSelected();
+  const topYear=baseYear;
+  const rows=DATA.records
+    .filter(r=>Number(r["年度"])===topYear && isFiniteNum(r.taiwan_rank))
+    .sort((a,b)=>(a.taiwan_rank-b.taiwan_rank)||(b.overall_mid-a.overall_mid))
+    .slice(0,15);
+
+  const labels=rows.map(r=>r["學校"]);
+  const values=rows.map(r=>r.overall_mid);
+  destroyChart("top");
+  charts.top=new Chart(document.getElementById("topChart"),{
     type:"bar",
-    data:{labels:rows.map(r=>`${r.taiwan_rank}. ${r["學校"]}`),datasets:[{label:"總分中點",data:rows.map(r=>r.overall_mid),backgroundColor:"rgba(216,180,254,.82)",borderColor:"#D8B4FE",borderWidth:1}]},
-    options:{...chartOptions("總分中點"), indexAxis:"y", plugins:{legend:{display:false}, tooltip:{callbacks:{label:(ctx)=>`總分中點：${fmtNum(ctx.raw)}；臺灣排名：${rows[ctx.dataIndex].taiwan_rank}`}}}}
+    data:{
+      labels,
+      datasets:[{
+        label:"Overall 中點",
+        data:values,
+        backgroundColor:"rgba(216,180,254,.82)",
+        borderColor:"rgba(216,180,254,1)",
+        borderWidth:1,
+        borderRadius:10
+      }]
+    },
+    options:{
+      indexAxis:"y",
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{label:(ctx)=>`Overall 中點：${fmt(ctx.parsed.x)}`}}
+      },
+      scales:{
+        x:{grid:{color:"rgba(148,163,184,.16)"},ticks:{color:"#cbd5e1"}},
+        y:{grid:{display:false},ticks:{color:"#e2e8f0",autoSkip:false}}
+      }
+    }
   });
 }
 function updateSdg() {
@@ -1368,7 +1396,7 @@ function updateAutoRangeAndFooter(){
 loadData();
 </script>
 
-  <footer class="site-footer"><div class="developed">Powered by</div><div class="unit">校務大數據分析組</div><div class="version">Version THE no-top-year• Last Updated: <span class="last-updated"></span></div></footer>
+  <footer class="site-footer"><div class="developed">Powered by</div><div class="unit">校務大數據分析組</div><div class="version">Version THE fixed• Last Updated: <span class="last-updated"></span></div></footer>
 
 </body>
 </html>
