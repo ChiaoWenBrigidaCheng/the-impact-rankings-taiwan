@@ -590,7 +590,11 @@ th.sortable.sort-desc::after{content:" ▼";color:#f8fafc}
 }
 
 
-/* Version THE fixed</style>
+
+/* THE final fix: Top 15 follows base year */
+.controls{grid-template-columns:2fr 1fr 1fr !important}
+@media(max-width:1050px){.controls{grid-template-columns:1fr !important}}
+</style>
 </head>
 <body>
 <div class="visual-depth" aria-hidden="true">
@@ -1058,12 +1062,11 @@ function trendChartOptions() {
     }
   };
 }
-function getSelected() {
+function getSelected(){
   return {
-    school: document.getElementById("schoolSelect").value,
-    baseYear: Number(document.getElementById("baseYearSelect").value),
-    compareYear: Number(document.getElementById("compareYearSelect").value),
-    topYear:document.getElementById("topYearSelect") ? (document.getElementById("topYearSelect") ? Number(document.getElementById("baseYearSelect").value) : Number(document.getElementById("baseYearSelect").value)) : Number(document.getElementById("baseYearSelect").value)
+    school:document.getElementById("schoolSelect").value,
+    baseYear:Number(document.getElementById("baseYearSelect").value),
+    compareYear:Number(document.getElementById("compareYearSelect").value)
   };
 }
 function findRow(school, year) {
@@ -1083,7 +1086,6 @@ function init() {
   }
   baseSel.value = yearsDesc[0];
   compSel.value = yearsDesc[1] || yearsDesc[0];
-  topSel.value = yearsDesc[0];
   [schoolSel,baseSel,compSel,topSel,document.getElementById("searchBox")].forEach(el=>el.addEventListener("input", updateAll));
   updateAll();
 }
@@ -1170,14 +1172,14 @@ function updateTrend() {
 }
 function updateTop(){
   const {baseYear}=getSelected();
-  const topYear=baseYear;
   const rows=DATA.records
-    .filter(r=>Number(r["年度"])===topYear && isFiniteNum(r.taiwan_rank))
+    .filter(r=>Number(r["年度"])===baseYear && isFiniteNum(r.taiwan_rank))
     .sort((a,b)=>(a.taiwan_rank-b.taiwan_rank)||(b.overall_mid-a.overall_mid))
     .slice(0,15);
 
   const labels=rows.map(r=>r["學校"]);
   const values=rows.map(r=>r.overall_mid);
+
   destroyChart("top");
   charts.top=new Chart(document.getElementById("topChart"),{
     type:"bar",
@@ -1396,7 +1398,7 @@ function updateAutoRangeAndFooter(){
 loadData();
 </script>
 
-  <footer class="site-footer"><div class="developed">Powered by</div><div class="unit">校務大數據分析組</div><div class="version">Version THE fixed• Last Updated: <span class="last-updated"></span></div></footer>
+  <footer class="site-footer"><div class="developed">Powered by</div><div class="unit">校務大數據分析組</div><div class="version">Version THE final fixed• Last Updated: <span class="last-updated"></span></div></footer>
 
 </body>
 </html>
