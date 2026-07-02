@@ -580,16 +580,7 @@ th.sortable.sort-desc::after{content:" ▼";color:#f8fafc}
 
 
 /* Final: match THE subtitle size exactly */
-.title-sub{
-  display:block !important;
-  margin-top:6px !important;
-  font-size:clamp(12px, 1.2vw, 18px) !important;
-  font-weight:700 !important;
-  letter-spacing:.06em !important;
-  line-height:1.15 !important;
-  color:#cbd5e1 !important;
-  text-shadow:0 0 8px rgba(167,139,250,.20) !important;
-}
+
 
 
 /* Final: NKUST highlight and school column visibility */
@@ -620,6 +611,46 @@ th.sortable.sort-desc::after{content:" ▼";color:#f8fafc}
 #dataTable th.school-col{z-index:12 !important}
 #dataTable tr:hover td.school-col{background:#17223c !important}
 #dataTable tr.nkust-row:hover td.school-col{background:rgba(255,214,112,.34) !important}
+
+
+/* Final QS header rebuilt to visually match THE */
+.hero{
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;
+  margin:8px 0 22px !important;
+  text-align:center !important;
+}
+
+h1{
+  margin:0 !important;
+  line-height:1.08 !important;
+  color:#f8fafc !important;
+  letter-spacing:.015em !important;
+  text-shadow:none !important;
+}
+
+.title-main{
+  display:block !important;
+  font-size:clamp(30px,4.6vw,62px) !important;
+  line-height:1.12 !important;
+  font-weight:850 !important;
+}
+
+.title-sub{
+  display:block !important;
+  margin-top:8px !important;
+  font-size:clamp(14px,1.8vw,22px) !important;
+  line-height:1.18 !important;
+  font-weight:600 !important;
+  letter-spacing:.08em !important;
+  color:#cbd5e1 !important;
+  text-shadow:none !important;
+}
+@media(max-width:1050px){
+  .title-main{font-size:clamp(28px,7vw,42px) !important}
+  .title-sub{font-size:clamp(14px,1.55vw,20px) !important}
+}
 
 </style>
 </head>
