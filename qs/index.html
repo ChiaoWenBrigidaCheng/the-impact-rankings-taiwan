@@ -652,6 +652,25 @@ h1{
   .title-sub{font-size:clamp(14px,1.55vw,20px) !important}
 }
 
+
+/* Final fix: stabilize Chart.js hover coordinate mapping */
+#topChart{
+  display:block !important;
+  width:100% !important;
+  height:100% !important;
+  transform:none !important;
+  zoom:1 !important;
+}
+.chartbox,
+.chartbox.tall{
+  transform:none !important;
+  zoom:1 !important;
+}
+.chartbox canvas{
+  transform:none !important;
+  zoom:1 !important;
+}
+
 </style>
 </head>
 <body>
@@ -1074,9 +1093,34 @@ function updateTop(){
     options:{
       ...chartOptions("分數"),
       indexAxis:"y",
+      responsive:true,
+      maintainAspectRatio:false,
+      interaction:{
+        mode:"nearest",
+        axis:"y",
+        intersect:false
+      },
+      hover:{
+        mode:"nearest",
+        axis:"y",
+        intersect:false
+      },
       plugins:{
         legend:{display:false},
-        tooltip:{callbacks:{label:(ctx)=>`整體比較：${fmtNum(ctx.raw)}；臺灣排名：${rows[ctx.dataIndex].taiwan_rank}`}}
+        tooltip:{
+          enabled:true,
+          mode:"nearest",
+          intersect:false,
+          position:"nearest",
+          yAlign:"center",
+          callbacks:{
+            title:(items)=>{
+              const idx=items?.[0]?.dataIndex;
+              return rows[idx] ? `${rows[idx].taiwan_rank}. ${rows[idx]["學校"]}` : "";
+            },
+            label:(ctx)=>`整體比較：${fmtNum(ctx.raw)}；臺灣排名：${rows[ctx.dataIndex].taiwan_rank}`
+          }
+        }
       }
     }
   });
