@@ -846,6 +846,42 @@ th.sortable.sort-desc::after{content:" ▼";color:#f8fafc}
   zoom:1 !important;
 }
 
+
+/* Final fix: freeze the School column in THE data table */
+#dataTable th.school-col,
+#dataTable td.school-col{
+  position:sticky !important;
+  left:0 !important;
+  z-index:8 !important;
+  background:#101a31 !important;
+  box-shadow:2px 0 0 rgba(148,163,184,.22), 10px 0 20px rgba(0,0,0,.20) !important;
+}
+#dataTable td.school-col{
+  background:rgba(15,23,42,.98) !important;
+  color:#f8fafc !important;
+  font-weight:800 !important;
+}
+#dataTable th.school-col{
+  z-index:12 !important;
+}
+#dataTable tr:hover td.school-col{
+  background:#17223c !important;
+}
+#dataTable tr.nkust-row td{
+  background:rgba(255,214,112,.16) !important;
+  border-top:1px solid rgba(255,214,112,.45) !important;
+  border-bottom:1px solid rgba(255,214,112,.45) !important;
+}
+#dataTable tr.nkust-row td.school-col{
+  background:rgba(255,214,112,.30) !important;
+  color:#fff !important;
+  font-weight:900 !important;
+  box-shadow:2px 0 0 rgba(255,214,112,.55), 10px 0 20px rgba(255,214,112,.14) !important;
+}
+#dataTable tr.nkust-row:hover td.school-col{
+  background:rgba(255,214,112,.34) !important;
+}
+
 </style>
 </head>
 <body>
@@ -1588,6 +1624,7 @@ function updateTable() {
   }).join("");
 
   document.getElementById("dataTable").innerHTML = `<thead><tr>${th}</tr></thead><tbody>${body}</tbody>`;
+  applySchoolColumnFreeze();
   applyNkustHighlight();
 
   document.querySelectorAll("#dataTable th.sortable").forEach(th=>{
@@ -1629,6 +1666,27 @@ document.addEventListener("DOMContentLoaded", () => {
 function applyNkustHighlight(){
   document.querySelectorAll("#dataTable tbody tr").forEach(tr=>{
     if(tr.textContent.includes("國立高雄科技大學")) tr.classList.add("nkust-row");
+  });
+}
+
+
+function applySchoolColumnFreeze(){
+  const table=document.getElementById("dataTable");
+  if(!table) return;
+  const headers=Array.from(table.querySelectorAll("thead th"));
+  const schoolIndex=headers.findIndex(th=>th.textContent.trim().replace(/[▲▼⇅]/g,"").trim()==="學校");
+  if(schoolIndex<0) return;
+  headers.forEach(th=>th.classList.remove("school-col"));
+  headers[schoolIndex].classList.add("school-col");
+  table.querySelectorAll("tbody tr").forEach(tr=>{
+    const cells=Array.from(tr.children);
+    cells.forEach(td=>td.classList.remove("school-col"));
+    if(cells[schoolIndex]){
+      cells[schoolIndex].classList.add("school-col");
+      if(cells[schoolIndex].textContent.trim()==="國立高雄科技大學"){
+        tr.classList.add("nkust-row");
+      }
+    }
   });
 }
 
