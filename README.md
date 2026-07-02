@@ -1,69 +1,277 @@
-# 臺灣大專校院永續排名追蹤平台｜Version 4.7 Final
+# Taiwan University Sustainability Rankings Dashboard
 
-這是重新整理後的 GitHub Pages 發布包，使用固定且乾淨的標準結構。
+## Project Overview
 
-```text
-/
-├── index.html
-├── the/
-│   ├── index.html
-│   └── the_data.xlsm
-└── qs/
-    ├── index.html
-    └── qs_data.xlsm
+This project provides an interactive website for visualizing Taiwan
+universities' performance in:
+
+-   **THE Impact Rankings**
+-   **QS Sustainability Rankings**
+
+The website is intended for internal use at **National Kaohsiung
+University of Science and Technology (NKUST)** to support international
+ranking analysis, benchmarking, and strategic planning.
+
+------------------------------------------------------------------------
+
+# Repository Structure
+
+    /
+    │
+    ├── index.html              # Portal (landing page)
+    │
+    ├── the/
+    │   ├── index.html
+    │   ├── the_data.xlsm
+    │   └── assets (optional)
+    │
+    ├── qs/
+    │   ├── index.html
+    │   ├── qs_data.xlsm
+    │   └── assets (optional)
+    │
+    └── README.md
+
+------------------------------------------------------------------------
+
+# Website Architecture
+
+## Portal
+
+The portal is the landing page.
+
+Responsibilities:
+
+-   Navigation only
+-   Links to THE and QS dashboards
+-   Does not load ranking data
+
+Navigation paths:
+
+-   `./the/index.html`
+-   `./qs/index.html`
+
+------------------------------------------------------------------------
+
+## THE Dashboard
+
+Main functions
+
+-   University selector
+-   Base year selector
+-   Comparison year selector
+-   Overall trend
+-   SDG performance
+-   Taiwan Top 15 universities
+-   Complete university table
+-   SDG scoring methodology popup
+-   Automatic Last Updated date
+
+Data source
+
+    the_data.xlsm
+
+------------------------------------------------------------------------
+
+## QS Dashboard
+
+Main functions
+
+-   University selector
+-   Base year selector
+-   Comparison year selector
+-   Overall ESG comparison
+-   Taiwan Top 15 universities
+-   Complete university table
+-   Automatic Last Updated date
+
+Data source
+
+    qs_data.xlsm
+
+------------------------------------------------------------------------
+
+# Data Update Workflow
+
+Each year only replace:
+
+THE
+
+    the/the_data.xlsm
+
+QS
+
+    qs/qs_data.xlsm
+
+Normally **no HTML modification** is required.
+
+------------------------------------------------------------------------
+
+# Annual Update Checklist
+
+1.  Replace Excel data.
+2.  Confirm all years are detected automatically.
+3.  Check:
+    -   University selector
+    -   Trend chart
+    -   Top 15 chart
+    -   Data table
+4.  Publish to GitHub.
+
+------------------------------------------------------------------------
+
+# Automatic Features
+
+The dashboards automatically:
+
+-   Detect available years
+-   Update year range subtitle
+-   Update "Last Updated"
+-   Generate Top 15 using the selected/base year
+-   Highlight NKUST
+-   Freeze the University column
+-   Adjust rankings for years with fewer than 15 Taiwan universities
+
+------------------------------------------------------------------------
+
+# Visual Design
+
+Theme
+
+-   Space / Galaxy
+-   Purple (THE)
+-   Gold (QS)
+
+Shared elements
+
+-   Nebula
+-   Orbiting planets
+-   Twinkling stars
+-   Meteors
+-   Animated background
+
+THE
+
+-   Purple charts
+
+QS
+
+-   Gold charts
+
+------------------------------------------------------------------------
+
+# Important Customizations
+
+## THE
+
+-   Top 15 follows **Base Year**
+-   No separate Top Year selector
+-   SDG methodology popup
+-   Purple Top 15 bars
+
+## QS
+
+-   No metric selector
+-   Top 15 uses Taiwan ranking
+-   If fewer than 15 universities exist (e.g. 2023), display all
+    available universities
+-   Gold Top 15 bars
+
+------------------------------------------------------------------------
+
+# Known Critical Components
+
+Do **not** remove without understanding their purpose:
+
+-   `updateTop()`
+-   `updateAutoRangeAndFooter()`
+-   `averageScore()`
+-   `chartOptions()`
+
+These functions control most interactive behaviors.
+
+------------------------------------------------------------------------
+
+# Common Issues
+
+## Top 15 tooltip misalignment
+
+Solution:
+
+-   Keep Chart.js interaction settings:
+
+``` javascript
+interaction:{
+    mode:"nearest",
+    axis:"y",
+    intersect:false
+}
 ```
 
-## 正式網址
+Do not apply CSS transforms to the chart canvas.
 
-- Portal：`https://<帳號>.github.io/<repository>/`
-- THE：`https://<帳號>.github.io/<repository>/the/index.html`
-- QS：`https://<帳號>.github.io/<repository>/qs/index.html`
+------------------------------------------------------------------------
 
-## 更新資料
+## Excel cannot be loaded
 
-請直接覆蓋：
-- `the/the_data.xlsm`
-- `qs/qs_data.xlsm`
+Check:
 
-請不要改檔名。
+-   Correct file names
+-   Relative paths
+-   GitHub folder structure
 
-## v4.1 更新
+------------------------------------------------------------------------
 
-- THE 與 QS 的各校資料總表新增「學校」欄位凍結效果，水平瀏覽後方欄位時仍可看到學校名稱。
+## NKUST highlight disappears
 
-## v4.2 更新
+Check the table rendering function and NKUST highlighting CSS.
 
-- 修正 QS 頁面 JavaScript 排序語法錯誤，避免頁面內容無法顯示。
+------------------------------------------------------------------------
 
-## v4.3 更新
+# GitHub Pages
 
-- 修正各校資料總表凍結欄位：THE 凍結第 3 欄「學校」，QS 凍結第 4 欄「學校」，不再誤凍結排名欄位。
+Recommended structure
 
-## v4.4 更新
+    root/
+        index.html
 
-- QS 頁面改為優先讀取內嵌資料，降低 GitHub Pages、Excel 讀取或外部套件載入造成空白頁的風險。
-- 若 Chart.js 暫時無法載入，資料表與 KPI 仍會顯示。
+        the/
+            index.html
+            the_data.xlsm
 
-## v4.5 更新
+        qs/
+            index.html
+            qs_data.xlsm
 
-- QS 背景調整為與 THE 相同的星球、orbit 與星群密度風格。
-- QS 年度區間副標字級與 THE 對齊。
-- THE 各校資料總表強化「國立高雄科技大學」醒目高亮效果。
+------------------------------------------------------------------------
 
-## v4.6 更新
+# Future Improvements
 
-- QS 年度區間副標字級與 THE 對齊。
-- QS 背景增加 orbit 星球與忽明忽暗星點層，視覺更接近 THE。
+Potential extensions:
 
-## v4.7 更新
+-   ARWU
+-   QS World University Rankings
+-   THE World University Rankings
+-   UI dark/light mode
+-   Export charts
+-   Download filtered data
+-   SciVal integration
+-   Responsive mobile optimization
 
-- 修正 THE 各校資料總表凍結欄位：改為凍結第 3 欄「學校」。
-- QS 各校資料總表刪除最後一欄「更新時間」。
+------------------------------------------------------------------------
 
-## Final 更新
+# Maintenance Notes
 
-- THE/QS 年度區間副標使用完全相同 CSS。
-- THE/QS 各校資料總表改為依「學校」欄 class 凍結，不再使用 nth-child 推測欄位。
-- QS 恢復國立高雄科技大學高亮。
-- QS 背景套用 THE 風格：星群、twinkle、星球與 orbit。
-- QS 資料表移除「更新時間」欄位。
+When modifying the dashboards:
+
+1.  Back up the current HTML before editing.
+2.  Test both dashboards locally.
+3.  Verify Portal → THE → QS navigation.
+4.  Verify all charts.
+5.  Verify Excel loading.
+6.  Commit changes with descriptive Git messages.
+
+------------------------------------------------------------------------
+
+Prepared for future maintainers of the NKUST Sustainability Rankings
+Dashboard.
