@@ -827,6 +827,25 @@ th.sortable.sort-desc::after{content:" ▼";color:#f8fafc}
   box-shadow:2px 0 0 rgba(255,214,112,.42), 8px 0 18px rgba(255,214,112,.12) !important;
 }
 
+
+/* Final fix: stabilize Chart.js hover coordinate mapping */
+#topChart{
+  display:block !important;
+  width:100% !important;
+  height:100% !important;
+  transform:none !important;
+  zoom:1 !important;
+}
+.chartbox,
+.chartbox.tall{
+  transform:none !important;
+  zoom:1 !important;
+}
+.chartbox canvas{
+  transform:none !important;
+  zoom:1 !important;
+}
+
 </style>
 </head>
 <body>
@@ -1405,14 +1424,59 @@ function updateTrend() {
   });
 }
 function updateTop() {
-  const {topYear} = getSelected();
-  const rows = DATA.records.filter(r=>Number(r["年度"])===topYear && r.taiwan_rank!=null)
-    .sort((a,b)=>a.taiwan_rank-b.taiwan_rank).slice(0,15);
+  const selected = getSelected();
+  const topYear = selected.topYear ?? selected.baseYear;
+  const rows = DATA.records
+    .filter(r=>Number(r["年度"])===topYear && r.taiwan_rank!=null)
+    .sort((a,b)=>a.taiwan_rank-b.taiwan_rank)
+    .slice(0,15);
+
   destroyChart("topChart");
   charts.topChart = new Chart(document.getElementById("topChart"), {
     type:"bar",
-    data:{labels:rows.map(r=>`${r.taiwan_rank}. ${r["學校"]}`),datasets:[{label:"總分中點",data:rows.map(r=>r.overall_mid),backgroundColor:"rgba(216,180,254,.82)",borderColor:"#D8B4FE",borderWidth:1}]},
-    options:{...chartOptions("總分中點"), indexAxis:"y", plugins:{legend:{display:false}, tooltip:{callbacks:{label:(ctx)=>`總分中點：${fmtNum(ctx.raw)}；臺灣排名：${rows[ctx.dataIndex].taiwan_rank}`}}}}
+    data:{
+      labels:rows.map(r=>`${r.taiwan_rank}. ${r["學校"]}`),
+      datasets:[{
+        label:"總分中點",
+        data:rows.map(r=>r.overall_mid),
+        backgroundColor:"rgba(216,180,254,.82)",
+        borderColor:"#D8B4FE",
+        borderWidth:1
+      }]
+    },
+    options:{
+      ...chartOptions("總分中點"),
+      indexAxis:"y",
+      responsive:true,
+      maintainAspectRatio:false,
+      interaction:{
+        mode:"nearest",
+        axis:"y",
+        intersect:false
+      },
+      hover:{
+        mode:"nearest",
+        axis:"y",
+        intersect:false
+      },
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          enabled:true,
+          mode:"nearest",
+          intersect:false,
+          position:"nearest",
+          yAlign:"center",
+          callbacks:{
+            title:(items)=>{
+              const idx=items?.[0]?.dataIndex;
+              return rows[idx] ? `${rows[idx].taiwan_rank}. ${rows[idx]["學校"]}` : "";
+            },
+            label:(ctx)=>`總分中點：${fmtNum(ctx.raw)}；臺灣排名：${rows[ctx.dataIndex].taiwan_rank}`
+          }
+        }
+      }
+    }
   });
 }
 function updateSdg() {
