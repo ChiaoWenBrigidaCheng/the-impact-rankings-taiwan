@@ -1275,7 +1275,7 @@ function updateAutoRangeAndFooter(){
   const d = new Date();
   const today = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
   document.querySelectorAll(".last-updated").forEach(el => el.textContent = today);
-  if (window.DATA && DATA.years && DATA.years.length) {
+  if ((typeof DATA !== "undefined") && DATA && DATA.years && DATA.years.length) {
     const years = DATA.years.map(Number).filter(Number.isFinite).sort((a,b)=>a-b);
     const sub = document.querySelector(".title-sub");
     if (sub && years.length) sub.textContent = `${years[0]}–${years[years.length-1]}區間`;
@@ -1288,5 +1288,169 @@ loadData().catch(err=>{
 });
 
 </script>
+
+<style id="nkust-rank-assistant-style">
+/* NKUST Ranking Assistant for QS */
+.nkust-ai-button{
+  position:fixed;right:24px;bottom:24px;z-index:99999;
+  display:flex;align-items:center;gap:10px;
+  border:1px solid rgba(255,214,112,.55);
+  background:linear-gradient(135deg,rgba(255,214,112,.98),rgba(251,191,36,.92));
+  color:#111827;border-radius:999px;padding:14px 18px;
+  font-weight:900;font-size:15px;letter-spacing:.02em;
+  box-shadow:0 18px 45px rgba(0,0,0,.38),0 0 26px rgba(255,214,112,.22);
+  cursor:pointer;transition:transform .18s ease,box-shadow .18s ease;
+}
+.nkust-ai-button:hover{transform:translateY(-2px);box-shadow:0 22px 54px rgba(0,0,0,.42),0 0 32px rgba(255,214,112,.32)}
+.nkust-ai-button .ai-dot{width:10px;height:10px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 5px rgba(34,197,94,.16)}
+.nkust-ai-panel{
+  position:fixed;right:24px;bottom:86px;z-index:99999;
+  width:min(430px,calc(100vw - 32px));max-height:min(720px,calc(100vh - 112px));
+  display:none;flex-direction:column;overflow:hidden;
+  border:1px solid rgba(148,163,184,.32);border-radius:22px;
+  background:linear-gradient(180deg,rgba(15,23,42,.98),rgba(5,8,20,.98));
+  color:#f8fafc;box-shadow:0 24px 70px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.05);
+  backdrop-filter:blur(12px);
+}
+.nkust-ai-panel.open{display:flex}
+.nkust-ai-header{padding:16px 18px;border-bottom:1px solid rgba(148,163,184,.20);display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.nkust-ai-title{font-weight:900;font-size:17px;line-height:1.3}.nkust-ai-sub{font-size:12px;color:#b7c3d8;margin-top:3px}.nkust-ai-close{border:0;background:rgba(148,163,184,.16);color:#e2e8f0;width:30px;height:30px;border-radius:50%;font-size:18px;cursor:pointer}
+.nkust-ai-body{padding:16px;overflow:auto;display:flex;flex-direction:column;gap:12px}.nkust-ai-msg{padding:12px 13px;border-radius:16px;font-size:14px;line-height:1.65;white-space:normal}.nkust-ai-msg.bot{background:rgba(30,41,59,.72);border:1px solid rgba(148,163,184,.18)}.nkust-ai-msg.user{align-self:flex-end;background:rgba(255,214,112,.92);color:#111827;font-weight:700;max-width:86%}
+.nkust-ai-msg b{color:#fff}.nkust-ai-msg.user b{color:#111827}.nkust-ai-msg ul{margin:7px 0 0 20px;padding:0}.nkust-ai-msg li{margin:3px 0}.nkust-ai-chips{display:flex;flex-wrap:wrap;gap:8px}.nkust-ai-chip{border:1px solid rgba(148,163,184,.28);background:rgba(15,23,42,.76);color:#e2e8f0;border-radius:999px;padding:8px 10px;font-size:12px;font-weight:800;cursor:pointer}.nkust-ai-chip:hover{border-color:rgba(255,214,112,.58);color:#fff;background:rgba(255,214,112,.12)}
+.nkust-ai-inputbar{display:flex;gap:8px;padding:12px;border-top:1px solid rgba(148,163,184,.20);background:rgba(5,8,20,.88)}.nkust-ai-inputbar input{flex:1;min-width:0;border-radius:999px}.nkust-ai-send{border:0;border-radius:999px;background:#FFD670;color:#111827;font-weight:900;padding:0 15px;cursor:pointer}.nkust-ai-mini{font-size:12px;color:#94a3b8;margin-top:8px;line-height:1.45}
+@media(max-width:640px){.nkust-ai-button{right:16px;bottom:16px;padding:13px 15px}.nkust-ai-panel{right:12px;left:12px;bottom:74px;width:auto}}
+</style>
+
+<div class="nkust-ai-panel" id="nkustAiPanel" aria-live="polite">
+  <div class="nkust-ai-header">
+    <div>
+      <div class="nkust-ai-title">🏆 NKUST 排名小助理</div>
+      <div class="nkust-ai-sub">QS Sustainability Rankings｜依目前頁面資料回答</div>
+    </div>
+    <button class="nkust-ai-close" id="nkustAiClose" aria-label="關閉">×</button>
+  </div>
+  <div class="nkust-ai-body" id="nkustAiBody">
+    <div class="nkust-ai-msg bot">
+      您好！我是 <b>NKUST 排名小助理</b>。我可以協助查詢 QS 永續排名、分析高科大趨勢、列出台灣 Top 15、比較學校，以及找出各指標表現最佳的大學。
+      <div class="nkust-ai-mini">所有數據都直接來自目前網頁載入的資料；若資料不存在，我會直接說明。</div>
+    </div>
+    <div class="nkust-ai-chips" id="nkustAiChips"></div>
+  </div>
+  <div class="nkust-ai-inputbar">
+    <input id="nkustAiInput" placeholder="例如：高科大近四年QS排名、比較高科大與北科、治理最佳學校">
+    <button class="nkust-ai-send" id="nkustAiSend">送出</button>
+  </div>
+</div>
+<button class="nkust-ai-button" id="nkustAiButton" type="button"><span class="ai-dot"></span>🏆 NKUST 排名小助理</button>
+
+<script id="nkust-rank-assistant-script">
+(function(){
+  const QUICK = ["分析高科大", "高科大近四年QS排名", "2026 QS台灣前15", "比較高科大與北科", "環境研究最佳學校", "治理最佳學校", "進步最多學校"];
+  const ALIASES = {
+    "高科大":"國立高雄科技大學", "nkust":"國立高雄科技大學",
+    "北科":"國立臺北科技大學", "台北科大":"國立臺北科技大學", "臺北科大":"國立臺北科技大學",
+    "台大":"國立臺灣大學", "臺大":"國立臺灣大學", "成大":"國立成功大學",
+    "台科":"國立臺灣科技大學", "臺科":"國立臺灣科技大學", "中山":"國立中山大學",
+    "清大":"國立清華大學", "陽明交大":"國立陽明交通大學", "中興":"國立中興大學",
+    "中央":"國立中央大學", "中正":"國立中正大學", "雲科":"國立雲林科技大學"
+  };
+  const METRIC_ALIASES = {
+    "環境影響":"環境影響總分", "環境總分":"環境影響總分", "環境永續":"環境永續性", "環境教育":"環境教育", "環境研究":"環境研究",
+    "社會影響":"社會影響總分", "社會總分":"社會影響總分", "平等":"平等", "知識交流":"知識交流", "教育影響":"教育影響力", "教育影響力":"教育影響力", "就業":"就業力", "就業力":"就業力", "健康":"健康福祉", "健康福祉":"健康福祉", "治理":"治理"
+  };
+  function $(id){return document.getElementById(id)}
+  function esc(s){return String(s ?? "").replace(/[&<>'"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[c]));}
+  function ready(){return (typeof DATA !== "undefined") && DATA && Array.isArray(DATA.records) && DATA.records.length;}
+  function years(){return ready() ? [...DATA.years].map(Number).sort((a,b)=>a-b) : [];}
+  function latestYear(){const y=years(); return y[y.length-1];}
+  function prevYear(){const y=years(); return y[y.length-2] || y[y.length-1];}
+  function row(school, year){return ready() ? DATA.records.find(r=>r["學校"]===school && Number(r["年度"])===Number(year)) : null;}
+  function value(v){return (v===null||v===undefined||v===""||Number.isNaN(v)) ? "—" : esc(v);}
+  function numfmt(v,d=1){return (v===null||v===undefined||Number.isNaN(v)) ? "—" : Number(v).toFixed(d);}
+  function avg(row){return typeof averageScore === "function" ? averageScore(row) : null;}
+  function detectMetric(q){q=q.toLowerCase(); for(const [k,v] of Object.entries(METRIC_ALIASES)){ if(q.includes(k.toLowerCase())) return v; } return null;}
+  function detectSchools(q){
+    const low=q.toLowerCase(); const found=[];
+    for(const [a,s] of Object.entries(ALIASES)){ if(low.includes(a.toLowerCase()) && !found.includes(s)) found.push(s); }
+    if(ready()) DATA.schools.forEach(s=>{ if(q.includes(s) && !found.includes(s)) found.push(s); });
+    return found;
+  }
+  function addMsg(html, who="bot"){
+    const div=document.createElement("div"); div.className=`nkust-ai-msg ${who}`; div.innerHTML=html;
+    const body=$("nkustAiBody"); body.appendChild(div); body.scrollTop=body.scrollHeight;
+  }
+  function userMsg(text){ addMsg(esc(text), "user"); }
+  function topList(year, metric=null, n=15){
+    const rows=DATA.records.filter(r=>Number(r["年度"])===Number(year) && r.taiwan_rank!=null)
+      .sort((a,b)=>a.taiwan_rank-b.taiwan_rank).slice(0,n);
+    return `<b>${year} QS 台灣 Top ${Math.min(n, rows.length)}</b><ul>` + rows.map(r=>`<li>${r.taiwan_rank}. ${esc(r["學校"])}｜世界排名 ${value(r["排名"])}｜整體比較 ${numfmt(avg(r))}</li>`).join("") + `</ul>`;
+  }
+  function analyzeSchool(school="國立高雄科技大學"){
+    const y=latestYear(), py=prevYear(), r=row(school,y), pr=row(school,py);
+    if(!r) return `目前資料中找不到 ${esc(school)} 在 ${y} 年的 QS 資料。`;
+    const metricRows=(DATA.metrics||[]).map(m=>({m, v:r[m+"_mid"]})).filter(x=>x.v!=null).sort((a,b)=>b.v-a.v);
+    const best=metricRows.slice(0,3).map(x=>`<li>${esc(x.m)}：${numfmt(x.v)}</li>`).join("") || `<li>目前無可用指標分數</li>`;
+    const weak=metricRows.slice(-3).reverse().map(x=>`<li>${esc(x.m)}：${numfmt(x.v)}</li>`).join("") || `<li>目前無可用指標分數</li>`;
+    let change="";
+    if(pr){
+      const tw = (pr.taiwan_rank!=null && r.taiwan_rank!=null) ? pr.taiwan_rank-r.taiwan_rank : null;
+      const world = (pr.world_rank_low!=null && r.world_rank_low!=null) ? pr.world_rank_low-r.world_rank_low : null;
+      change = `<br><b>與 ${py} 年相比</b><ul><li>臺灣排名：${tw==null?"—":(tw>0?`進步 ${tw} 名`:tw<0?`退步 ${Math.abs(tw)} 名`:"持平")}</li><li>世界排名下限：${world==null?"—":(world>0?`進步 ${world}`:world<0?`退步 ${Math.abs(world)}`:"持平")}</li></ul>`;
+    }
+    return `<b>${esc(school)}｜${y} QS 永續排名摘要</b><ul><li>世界排名：${value(r["排名"])}</li><li>臺灣排名：${value(r.taiwan_rank)}</li><li>整體比較：約 ${numfmt(avg(r))}</li><li>環境影響總分：${numfmt(r["環境影響總分_mid"])}</li><li>社會影響總分：${numfmt(r["社會影響總分_mid"])}</li><li>治理：${numfmt(r["治理_mid"])}</li></ul>${change}<b>相對強項</b><ul>${best}</ul><b>相對弱項</b><ul>${weak}</ul>`;
+  }
+  function trendSchool(school="國立高雄科技大學"){
+    const rows=DATA.records.filter(r=>r["學校"]===school).sort((a,b)=>Number(a["年度"])-Number(b["年度"]));
+    if(!rows.length) return `目前資料中找不到 ${esc(school)} 的歷年資料。`;
+    return `<b>${esc(school)}｜QS 歷年排名趨勢</b><ul>` + rows.map(r=>`<li>${r["年度"]}：世界排名 ${value(r["排名"])}｜臺灣排名 ${value(r.taiwan_rank)}｜整體比較 ${numfmt(avg(r))}</li>`).join("") + `</ul>`;
+  }
+  function bestMetric(metric){
+    const y=latestYear();
+    const rows=DATA.records.filter(r=>Number(r["年度"])===y && r[metric+"_mid"]!=null).sort((a,b)=>b[metric+"_mid"]-a[metric+"_mid"]).slice(0,10);
+    if(!rows.length) return `目前 ${y} 年資料中沒有「${esc(metric)}」可排序分數。`;
+    return `<b>${y} 年「${esc(metric)}」表現最佳學校 Top ${rows.length}</b><ul>` + rows.map((r,i)=>`<li>${i+1}. ${esc(r["學校"])}｜${numfmt(r[metric+"_mid"])}｜臺灣排名 ${value(r.taiwan_rank)}</li>`).join("") + `</ul>`;
+  }
+  function improvement(){
+    const y=latestYear(), py=prevYear();
+    const rows=DATA.records.filter(r=>Number(r["年度"])===y).map(r=>{
+      const pr=row(r["學校"],py);
+      if(!pr || r.taiwan_rank==null || pr.taiwan_rank==null) return null;
+      return {school:r["學校"], now:r.taiwan_rank, prev:pr.taiwan_rank, delta:pr.taiwan_rank-r.taiwan_rank, worldDelta:(pr.world_rank_low!=null&&r.world_rank_low!=null)?pr.world_rank_low-r.world_rank_low:null};
+    }).filter(Boolean).sort((a,b)=>b.delta-a.delta).slice(0,10);
+    if(!rows.length) return `目前無法比較 ${py} 與 ${y} 的排名變化。`;
+    return `<b>${py} → ${y} 臺灣排名進步最多學校</b><ul>` + rows.map((x,i)=>`<li>${i+1}. ${esc(x.school)}｜${x.prev} → ${x.now}｜${x.delta>0?`進步 ${x.delta} 名`:x.delta<0?`退步 ${Math.abs(x.delta)} 名`:"持平"}</li>`).join("") + `</ul>`;
+  }
+  function compare(s1, s2){
+    const y=latestYear(), a=row(s1,y), b=row(s2,y);
+    if(!a || !b) return `目前 ${y} 年資料中無法同時找到 ${esc(s1)} 與 ${esc(s2)}。`;
+    const metrics=["環境影響總分","社會影響總分","治理","環境研究","就業力","健康福祉"];
+    let html=`<b>${y} QS 比較｜${esc(s1)} vs ${esc(s2)}</b><ul><li>世界排名：${esc(s1)} ${value(a["排名"])}；${esc(s2)} ${value(b["排名"])}</li><li>臺灣排名：${esc(s1)} ${value(a.taiwan_rank)}；${esc(s2)} ${value(b.taiwan_rank)}</li><li>整體比較：${esc(s1)} ${numfmt(avg(a))}；${esc(s2)} ${numfmt(avg(b))}</li></ul><b>主要指標差異</b><ul>`;
+    html += metrics.map(m=>`<li>${esc(m)}：${esc(s1)} ${numfmt(a[m+"_mid"])}；${esc(s2)} ${numfmt(b[m+"_mid"])}</li>`).join("") + `</ul>`;
+    return html;
+  }
+  function respond(q){
+    if(!ready()) return "資料仍在載入中，請稍候幾秒後再試。";
+    const low=q.toLowerCase(); const schools=detectSchools(q); const metric=detectMetric(q);
+    if(metric && /(最佳|最好|top|前|最高|排名)/i.test(q)) return bestMetric(metric);
+    if(/top\s*15|前\s*15|台灣前15|臺灣前15/.test(low)) return topList(latestYear(), null, 15);
+    if(/進步最多|改善最多|提升最多/.test(q)) return improvement();
+    if(/比較|vs|VS|和|與/.test(q) && schools.length>=2) return compare(schools[0], schools[1]);
+    if(/趨勢|歷年|近四年|近4年|近三年|近3年/.test(q)) return trendSchool(schools[0] || "國立高雄科技大學");
+    if(/分析|摘要|高科大|nkust|排名/.test(low)) return analyzeSchool(schools[0] || "國立高雄科技大學");
+    return `我目前可以回答 QS 永續排名資料查詢與分析。您可以問：「高科大近四年QS排名」、「2026 QS台灣前15」、「比較高科大與北科」、「治理最佳學校」或「進步最多學校」。`;
+  }
+  function send(text){ const q=(text||$("nkustAiInput").value||"").trim(); if(!q) return; userMsg(q); $("nkustAiInput").value=""; setTimeout(()=>addMsg(respond(q)),80); }
+  function initAssistant(){
+    const panel=$("nkustAiPanel"), btn=$("nkustAiButton"), close=$("nkustAiClose"), sendBtn=$("nkustAiSend"), input=$("nkustAiInput"), chips=$("nkustAiChips");
+    if(!panel||!btn) return;
+    chips.innerHTML=QUICK.map(q=>`<button type="button" class="nkust-ai-chip">${esc(q)}</button>`).join("");
+    btn.addEventListener("click",()=>panel.classList.toggle("open")); close.addEventListener("click",()=>panel.classList.remove("open"));
+    sendBtn.addEventListener("click",()=>send()); input.addEventListener("keydown",e=>{if(e.key==="Enter") send();});
+    chips.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>send(b.textContent)));
+  }
+  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", initAssistant); else initAssistant();
+})();
+</script>
+
 </body>
 </html>
