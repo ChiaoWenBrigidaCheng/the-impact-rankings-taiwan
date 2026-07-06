@@ -1758,7 +1758,7 @@ loadData();
       <div class="nkust-ai-title">🏆 NKUST 排名小助理</div>
       <div class="nkust-ai-sub" id="nkustAiSubtitle">依目前頁面資料回答</div>
     </div>
-    <button class="nkust-ai-close" id="nkustAiClose" aria-label="關閉" type="button">×</button>
+    <button class="nkust-ai-close" id="nkustAiClose" aria-label="關閉" type="button" onclick="document.getElementById('nkustAiPanel').classList.remove('open')">×</button>
   </div>
   <div class="nkust-ai-body" id="nkustAiBody">
     <div class="nkust-ai-msg bot" id="nkustAiWelcome"></div>
@@ -1769,7 +1769,7 @@ loadData();
     <button class="nkust-ai-send" id="nkustAiSend" type="button">送出</button>
   </div>
 </div>
-<button class="nkust-ai-button" id="nkustAiButton" type="button">🏆 NKUST 排名小助理</button>
+<button class="nkust-ai-button" id="nkustAiButton" type="button" onclick="document.getElementById('nkustAiPanel').classList.toggle('open')">🏆 NKUST 排名小助理</button>
 
 
 <script id="nkust-rank-assistant-unified-script">
@@ -1932,5 +1932,32 @@ ${change?`• 年度變化：${change}
 </script>
 
 
+
+<style id="nkust-ai-dialog-emergency-fix">
+#nkustAiButton.nkust-ai-button{display:flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;}
+#nkustAiPanel.nkust-ai-panel{visibility:visible!important;opacity:1!important;pointer-events:auto!important;}
+#nkustAiPanel.nkust-ai-panel.open{display:flex!important;z-index:2147483647!important;}
+</style>
+<script id="nkust-ai-dialog-emergency-script">
+(function(){
+  function bindNkustAssistantDialog(){
+    var btn=document.getElementById('nkustAiButton');
+    var panel=document.getElementById('nkustAiPanel');
+    var close=document.getElementById('nkustAiClose');
+    if(!btn||!panel)return;
+    if(!btn.dataset.dialogBound){
+      btn.addEventListener('click',function(){ panel.classList.toggle('open'); });
+      btn.dataset.dialogBound='1';
+    }
+    if(close&&!close.dataset.dialogBound){
+      close.addEventListener('click',function(){ panel.classList.remove('open'); });
+      close.dataset.dialogBound='1';
+    }
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bindNkustAssistantDialog);
+  else bindNkustAssistantDialog();
+  setTimeout(bindNkustAssistantDialog,500);
+})();
+</script>
 </body>
 </html>
