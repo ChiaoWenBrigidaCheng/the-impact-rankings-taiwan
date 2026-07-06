@@ -1356,75 +1356,95 @@ loadData().catch(err=>{
 
 <script id="nkust-rank-assistant-unified-script">
 (function(){
+  "use strict";
   const PLATFORM = /QS/i.test(document.title) ? "QS" : "THE";
   const TARGET = "國立高雄科技大學";
-  const ALIASES = {
-    "高科大":TARGET,"nkust":TARGET,"NKUST":TARGET,
-    "北科":"國立臺北科技大學","台北科大":"國立臺北科技大學","臺北科大":"國立臺北科技大學",
-    "台大":"國立臺灣大學","臺大":"國立臺灣大學","成大":"國立成功大學",
-    "台科":"國立臺灣科技大學","臺科":"國立臺灣科技大學","中山":"國立中山大學",
-    "清大":"國立清華大學","陽明交大":"國立陽明交通大學","中興":"國立中興大學",
-    "中央":"國立中央大學","中正":"國立中正大學","雲科":"國立雲林科技大學",
-    "師大":"國立臺灣師範大學","海大":"國立臺灣海洋大學"
-  };
-  const QS_METRIC_ALIASES = {
-    "環境影響":"環境影響總分","環境總分":"環境影響總分","環境永續":"環境永續性","環境教育":"環境教育","環境研究":"環境研究",
-    "社會影響":"社會影響總分","社會總分":"社會影響總分","平等":"平等","知識交流":"知識交流","教育影響":"教育影響力","教育影響力":"教育影響力",
-    "就業":"就業力","就業力":"就業力","健康":"健康福祉","健康福祉":"健康福祉","治理":"治理"
-  };
-  const THE_SDGS = Array.from({length:17},(_,i)=>`SDG${i+1}`);
-  const QUICK = PLATFORM === "QS"
-    ? ["分析高科大", "高科大近四年QS排名", "2026 QS台灣前15", "比較高科大與北科", "環境研究最佳學校", "治理最佳學校", "進步最多學校", "相近學校"]
-    : ["分析高科大", "高科大近五年THE排名", "2026 THE台灣前15", "比較高科大與北科", "SDG17最佳學校", "高科大弱項", "進步最多學校", "相近學校"];
+  const SDGS = Array.from({length:17},(_,i)=>`SDG${i+1}`);
+  const SCHOOL_ALIASES = {"高科大":TARGET,"nkust":TARGET,"NKUST":TARGET,"高雄科技大學":TARGET,"北科":"國立臺北科技大學","北科大":"國立臺北科技大學","台北科大":"國立臺北科技大學","臺北科大":"國立臺北科技大學","台大":"國立臺灣大學","臺大":"國立臺灣大學","NTU":"國立臺灣大學","成大":"國立成功大學","NCKU":"國立成功大學","台科":"國立臺灣科技大學","臺科":"國立臺灣科技大學","台科大":"國立臺灣科技大學","臺科大":"國立臺灣科技大學","中山":"國立中山大學","清大":"國立清華大學","陽明交大":"國立陽明交通大學","陽交大":"國立陽明交通大學","中興":"國立中興大學","中央":"國立中央大學","中正":"國立中正大學","雲科":"國立雲林科技大學","雲科大":"國立雲林科技大學","師大":"國立臺灣師範大學","海大":"國立臺灣海洋大學","東海":"東海大學","淡江":"淡江大學","輔大":"輔仁大學","亞洲":"亞洲大學","逢甲":"逢甲大學","元智":"元智大學","北醫":"臺北醫學大學","高醫":"高雄醫學大學"};
+  const QS_METRICS = ["環境影響總分","環境永續性","環境教育","環境研究","社會影響總分","平等","知識交流","教育影響力","就業力","健康福祉","治理"];
+  const QS_METRIC_ALIASES = {"環境影響":"環境影響總分","環境總分":"環境影響總分","環境":"環境影響總分","環境永續":"環境永續性","永續性":"環境永續性","環境教育":"環境教育","環境研究":"環境研究","社會影響":"社會影響總分","社會總分":"社會影響總分","社會":"社會影響總分","平等":"平等","知識交流":"知識交流","教育影響":"教育影響力","教育影響力":"教育影響力","就業":"就業力","就業力":"就業力","健康":"健康福祉","健康福祉":"健康福祉","治理":"治理","governance":"治理","Governance":"治理"};
+  const QUICK = PLATFORM === "QS" ? ["分析高科大", "高科大近四年QS排名", "2026 QS台灣前15", "比較高科大與北科", "環境研究最佳學校", "治理最佳學校", "高科大弱項", "有哪些學校跟高科大接近"] : ["分析高科大", "高科大近五年THE排名", "2026 THE台灣前15", "比較高科大與北科", "SDG17最佳學校", "高科大弱項", "哪些學校進步最多", "有哪些學校跟高科大接近"];
   function $(id){return document.getElementById(id)}
   function esc(s){return String(s ?? "").replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[c]));}
+  function norm(s){return String(s||"").replace(/臺/g,"台").replace(/[–—]/g,"-").trim();}
+  function num(v){if(v===null||v===undefined||v==="") return null; const x=Number(String(v).replace(/,/g,"")); return Number.isFinite(x)?x:null;}
+  function fmt(v,d=1){const x=num(v); return x===null?"—":(Number.isInteger(x)?String(x):x.toFixed(d));}
+  function rank(v){return (v===null||v===undefined||v==="") ? "—" : String(v).replace(/-/g,"–");}
+  function val(v){return (v===null||v===undefined||v==="")?"—":esc(v)}
   function payload(){try{const el=$("embedded-data");return el&&el.textContent.trim()?JSON.parse(el.textContent):null}catch(e){return null}}
-  function getData(){
+  function data(){
     if(typeof DATA !== "undefined" && DATA && Array.isArray(DATA.records) && DATA.records.length) return DATA;
     const p=payload();
     if(p && Array.isArray(p.records) && p.records.length){
       const records=p.records;
-      const years=[...new Set(records.map(r=>Number(r["年度"])).filter(Number.isFinite))].sort((a,b)=>a-b);
+      const years=[...new Set(records.map(r=>num(r["年度"])).filter(Number.isFinite))].sort((a,b)=>a-b);
       const schools=[...new Set(records.map(r=>r["學校"]).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),"zh-Hant"));
-      const metrics=PLATFORM==="QS" ? ["環境影響總分","環境永續性","環境教育","環境研究","社會影響總分","平等","知識交流","教育影響力","就業力","健康福祉","治理"] : THE_SDGS;
-      return {records,years,schools,metrics,sdgs:THE_SDGS};
+      return {records,years,schools,metrics:PLATFORM==="QS"?QS_METRICS:SDGS,sdgs:SDGS};
     }
+    return {records:[],years:[],schools:[],metrics:PLATFORM==="QS"?QS_METRICS:SDGS,sdgs:SDGS};
+  }
+  function ready(){return data().records.length>0;}
+  function years(){return data().years.map(Number).filter(Number.isFinite).sort((a,b)=>a-b)}
+  function latestYear(){const ys=years();return ys[ys.length-1];}
+  function previousYear(){const ys=years();return ys[ys.length-2]||ys[ys.length-1];}
+  function score(r, metric){
+    if(!r) return null;
+    if(!metric || /overall|整體|總體|總分/i.test(metric)) return num(r.overall_mid ?? r["Overall"] ?? r["排名(取低)"]);
+    if(PLATFORM==="THE" && /^SDG\d+$/i.test(metric)) return num(r[`${metric.toUpperCase()}_mid`] ?? r[metric.toUpperCase()]);
+    return num(r[metric]);
+  }
+  function rankLow(r){return num(r?.["排名(取低)"] ?? r?.world_rank_low ?? r?.rank_low ?? r?.["排名"]);}
+  function twRank(r){return num(r?.["臺灣排名"] ?? r?.taiwan_rank);}
+  function byYear(year){return data().records.filter(r=>num(r["年度"])===Number(year));}
+  function schoolNames(){return data().schools || [...new Set(data().records.map(r=>r["學校"]).filter(Boolean))];}
+  function school(input){
+    const q = norm(input); const low=q.toLowerCase();
+    for(const k of Object.keys(SCHOOL_ALIASES).sort((a,b)=>b.length-a.length)){ if(low.includes(norm(k).toLowerCase())) return SCHOOL_ALIASES[k]; }
+    const schools = schoolNames();
+    let found = schools.find(s=>low.includes(norm(s).toLowerCase()) || norm(s).toLowerCase().includes(low));
+    if(found) return found;
+    const token = q.replace(/國立|大學|科技|學校|排名|比較|分析|表現|請問|今年|去年/g,"");
+    if(token.length>=2){ found = schools.find(s=>norm(s).includes(token)); if(found) return found; }
     return null;
   }
-  function ready(){const d=getData();return d&&Array.isArray(d.records)&&d.records.length>0}
-  function D(){return getData()||{records:[],years:[],schools:[],metrics:[],sdgs:THE_SDGS}}
-  function years(){return [...(D().years||[])].map(Number).filter(Number.isFinite).sort((a,b)=>a-b)}
-  function latestYear(){const y=years();return y[y.length-1]}
-  function prevYear(){const y=years();return y[y.length-2]||y[y.length-1]}
-  function n(v){if(v===null||v===undefined||v==="") return null; const x=Number(String(v).replace(/,/g,"")); return Number.isFinite(x)?x:null}
-  function cleanRank(v){return (v===null||v===undefined||v==="") ? "—" : String(v).replace(/-/g,"–")}
-  function fmt(v,d=1){const x=n(v); return x===null ? "—" : (Number.isInteger(x)?String(x):x.toFixed(d))}
-  function val(v){return (v===null||v===undefined||v==="")?"—":esc(v)}
-  function getRow(school,year){return D().records.find(r=>r["學校"]===school && Number(r["年度"])===Number(year))||null}
-  function score(row){if(!row)return null; if(PLATFORM==="THE") return n(row.overall_mid ?? row["Overall"]); const ms=D().metrics||[]; const vals=ms.map(m=>n(row[m+"_mid"] ?? row[m])).filter(x=>x!==null); return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:null}
-  function fieldMid(row,field){return n(row?.[field+"_mid"] ?? row?.[field])}
-  function norm(s){return String(s||"").toLowerCase().replace(/\s+/g,"")}
-  function detectYear(q){const m=String(q).match(/20\d{2}/); return m?Number(m[0]):latestYear()}
-  function detectSchools(q){const nq=norm(q), found=[]; for(const [a,s] of Object.entries(ALIASES)){if(nq.includes(norm(a))&&!found.includes(s))found.push(s)}; D().schools.forEach(s=>{if((nq.includes(norm(s))||norm(s).includes(nq))&&!found.includes(s))found.push(s)}); return found}
-  function detectMetric(q){
-    if(PLATFORM==="THE"){const m=String(q).toUpperCase().match(/SDG\s*(1[0-7]|[1-9])/); return m?`SDG${Number(m[1])}`:null}
-    const nq=norm(q); for(const [a,m] of Object.entries(QS_METRIC_ALIASES)){if(nq.includes(norm(a))) return m} return null;
+  function schoolsIn(q){
+    const out=[]; const nq=norm(q).toLowerCase();
+    for(const [a,full] of Object.entries(SCHOOL_ALIASES)){ if(nq.includes(norm(a).toLowerCase()) && !out.includes(full)) out.push(full); }
+    for(const s of schoolNames()){ const ns=norm(s).toLowerCase(), simp=ns.replace(/國立|大學|科技/g,""); if((nq.includes(ns)||(simp.length>=2&&nq.includes(simp)))&&!out.includes(s)) out.push(s); }
+    return out;
   }
-  function addMsg(html, who="bot"){const body=$("nkustAiBody"); if(!body)return; const div=document.createElement("div"); div.className=`nkust-ai-msg ${who}`; div.innerHTML=html; body.appendChild(div); body.scrollTop=body.scrollHeight;}
-  function topList(year=latestYear(), limit=15){const rows=D().records.filter(r=>Number(r["年度"])===Number(year)&&n(r.taiwan_rank??r["臺灣排名"])!==null).sort((a,b)=>n(a.taiwan_rank??a["臺灣排名"])-n(b.taiwan_rank??b["臺灣排名"])).slice(0,limit); if(!rows.length)return `${year} 年沒有可排序的臺灣排名資料。`; return `<b>${year} ${PLATFORM} 臺灣 Top ${Math.min(limit,rows.length)}</b><ul>`+rows.map(r=>`<li>${fmt(r.taiwan_rank??r["臺灣排名"],0)}. ${esc(r["學校"])}｜世界排名 ${cleanRank(r["排名"])}${PLATFORM==="THE"?`｜Overall ${val(r["Overall"])}（中點 ${fmt(score(r))}）`:`｜整體比較 ${fmt(score(r))}`}</li>`).join("")+`</ul>`}
-  function topMetric(metric,year=latestYear(),limit=10){const rows=D().records.filter(r=>Number(r["年度"])===Number(year)&&fieldMid(r,metric)!==null).sort((a,b)=>fieldMid(b,metric)-fieldMid(a,metric)).slice(0,limit); if(!rows.length)return `${year} 年資料中沒有「${esc(metric)}」可排序分數。`; return `<b>${year} ${PLATFORM}｜${esc(metric)}最佳學校 Top ${rows.length}</b><ul>`+rows.map((r,i)=>`<li>${i+1}. ${esc(r["學校"])}｜${fmt(fieldMid(r,metric))}｜臺灣排名 ${fmt(r.taiwan_rank??r["臺灣排名"],0)}</li>`).join("")+`</ul>`}
-  function schoolMetrics(row, reverse=false, limit=3){const metrics=PLATFORM==="THE"?THE_SDGS:D().metrics; return metrics.map(m=>({m,v:fieldMid(row,m)})).filter(x=>x.v!==null).sort((a,b)=>reverse?a.v-b.v:b.v-a.v).slice(0,limit)}
-  function analyzeSchool(school=TARGET,year=latestYear()){const r=getRow(school,year); if(!r)return `目前資料中找不到 ${esc(school)} 在 ${year} 年的 ${PLATFORM} 資料。`; const pr=getRow(school,year-1); let trend=""; if(pr){const rd=(n(pr.taiwan_rank??pr["臺灣排名"])!==null&&n(r.taiwan_rank??r["臺灣排名"])!==null)?n(pr.taiwan_rank??pr["臺灣排名"])-n(r.taiwan_rank??r["臺灣排名"]):null; const sd=(score(r)!==null&&score(pr)!==null)?score(r)-score(pr):null; trend=`<br><b>與 ${year-1} 年相比</b><ul><li>臺灣排名：${rd===null?"—":rd>0?`進步 ${rd} 名`:rd<0?`退步 ${Math.abs(rd)} 名`:"持平"}</li><li>${PLATFORM==="THE"?"Overall中點":"整體比較"}：${sd===null?"—":sd>=0?`增加 ${sd.toFixed(1)}`:`下降 ${Math.abs(sd).toFixed(1)}`}</li></ul>`} const best=schoolMetrics(r,false,3), weak=schoolMetrics(r,true,3); return `<b>${esc(school)}｜${year} ${PLATFORM} 排名摘要</b><ul><li>世界排名：${cleanRank(r["排名"])}</li><li>臺灣排名：${fmt(r.taiwan_rank??r["臺灣排名"],0)}</li><li>${PLATFORM==="THE"?`Overall：${val(r["Overall"])}（中點 ${fmt(score(r))}）`:`整體比較：約 ${fmt(score(r))}`}</li></ul>${trend}<b>相對強項</b><ul>${best.map(x=>`<li>${esc(x.m)}：${fmt(x.v)}</li>`).join("")||"<li>目前無可用分數</li>"}</ul><b>相對弱項</b><ul>${weak.map(x=>`<li>${esc(x.m)}：${fmt(x.v)}</li>`).join("")||"<li>目前無可用分數</li>"}</ul>`}
-  function trendSchool(school=TARGET){const rows=D().records.filter(r=>r["學校"]===school).sort((a,b)=>Number(a["年度"])-Number(b["年度"])); if(!rows.length)return `目前資料中找不到 ${esc(school)} 的歷年資料。`; return `<b>${esc(school)}｜${PLATFORM} 歷年趨勢</b><ul>`+rows.map(r=>`<li>${r["年度"]}：世界排名 ${cleanRank(r["排名"])}｜臺灣排名 ${fmt(r.taiwan_rank??r["臺灣排名"],0)}｜${PLATFORM==="THE"?"Overall中點":"整體比較"} ${fmt(score(r))}</li>`).join("")+`</ul>`}
-  function compare(s1,s2,year=latestYear()){const a=getRow(s1,year), b=getRow(s2,year); if(!a||!b)return `目前 ${year} 年資料中無法同時找到 ${esc(s1)} 與 ${esc(s2)}。`; const metrics=PLATFORM==="THE"?["Overall","SDG9","SDG17","SDG8","SDG14"]:["環境影響總分","社會影響總分","治理","環境研究","就業力","健康福祉"]; let html=`<b>${year} ${PLATFORM} 比較｜${esc(s1)} vs ${esc(s2)}</b><ul><li>世界排名：${esc(s1)} ${cleanRank(a["排名"])}；${esc(s2)} ${cleanRank(b["排名"])}</li><li>臺灣排名：${esc(s1)} ${fmt(a.taiwan_rank??a["臺灣排名"],0)}；${esc(s2)} ${fmt(b.taiwan_rank??b["臺灣排名"],0)}</li><li>${PLATFORM==="THE"?"Overall中點":"整體比較"}：${esc(s1)} ${fmt(score(a))}；${esc(s2)} ${fmt(score(b))}</li></ul><b>主要指標差異</b><ul>`; html+=metrics.map(m=>m==="Overall"?`<li>Overall：${esc(s1)} ${val(a["Overall"])}；${esc(s2)} ${val(b["Overall"])}</li>`:`<li>${esc(m)}：${esc(s1)} ${fmt(fieldMid(a,m))}；${esc(s2)} ${fmt(fieldMid(b,m))}</li>`).join("")+`</ul>`; return html}
-  function improvement(year=latestYear()){const py=year-1; const rows=D().records.filter(r=>Number(r["年度"])===Number(year)).map(r=>{const p=getRow(r["學校"],py); if(!p)return null; const now=n(r.taiwan_rank??r["臺灣排名"]), prev=n(p.taiwan_rank??p["臺灣排名"]); if(now===null||prev===null)return null; return {school:r["學校"],now,prev,delta:prev-now}}).filter(Boolean).sort((a,b)=>b.delta-a.delta).slice(0,10); if(!rows.length)return `目前無法比較 ${py} 與 ${year} 的排名變化。`; return `<b>${py} → ${year} 臺灣排名進步最多學校</b><ul>`+rows.map((x,i)=>`<li>${i+1}. ${esc(x.school)}｜${x.prev} → ${x.now}｜${x.delta>0?`進步 ${x.delta} 名`:x.delta<0?`退步 ${Math.abs(x.delta)} 名`:"持平"}</li>`).join("")+`</ul>`}
-  function similar(school=TARGET,year=latestYear()){const r=getRow(school,year); if(!r)return `目前找不到 ${esc(school)} 在 ${year} 年的資料。`; const baseRank=n(r.taiwan_rank??r["臺灣排名"]), baseScore=score(r); const rows=D().records.filter(x=>Number(x["年度"])===Number(year)&&x["學校"]!==school).map(x=>({school:x["學校"],rank:n(x.taiwan_rank??x["臺灣排名"]),score:score(x),rankText:x["排名"]})).filter(x=>x.rank!==null||x.score!==null).map(x=>({...x,dist:(baseRank!==null&&x.rank!==null?Math.abs(x.rank-baseRank)*2:0)+(baseScore!==null&&x.score!==null?Math.abs(x.score-baseScore):0)})).sort((a,b)=>a.dist-b.dist).slice(0,5); return `<b>${year} 年與 ${esc(school)} 表現相近的學校</b><ul>`+rows.map(x=>`<li>${esc(x.school)}｜世界排名 ${cleanRank(x.rankText)}｜臺灣排名 ${fmt(x.rank,0)}｜${PLATFORM==="THE"?"Overall中點":"整體比較"} ${fmt(x.score)}</li>`).join("")+`</ul>`}
-  function respond(q){if(!ready())return "資料仍在載入中，請稍候幾秒後再試。"; const year=detectYear(q), metric=detectMetric(q), schools=detectSchools(q), low=String(q).toLowerCase(); if(metric&&/(最佳|最好|最高|top|前|排名)/i.test(q))return topMetric(metric,year,10); if(/top\s*15|前\s*15|台灣前15|臺灣前15/.test(low))return topList(year,15); if(/進步最多|改善最多|提升最多|上升最多/.test(q))return improvement(year); if(/相近|差不多|benchmark|標竿|類似/.test(low))return similar(schools[0]||TARGET,year); if(/比較|vs|VS|和|與/.test(q)&&schools.length>=2)return compare(schools[0],schools[1],year); if(/趨勢|歷年|近五年|近5年|近四年|近4年|近三年|近3年/.test(q))return trendSchool(schools[0]||TARGET); if(/弱項|弱勢|最低|需要改善/.test(q))return analyzeSchool(schools[0]||TARGET,year); if(/分析|摘要|高科大|nkust|排名/.test(low))return analyzeSchool(schools[0]||TARGET,year); return `我目前可以回答 ${PLATFORM} 排名資料查詢與分析。您可以問：「高科大排名」、「台灣前15」、「比較高科大與北科」、「${PLATFORM==="THE"?"SDG17最佳學校":"治理最佳學校"}」、「進步最多學校」或「相近學校」。`}
-  function send(text){const input=$("nkustAiInput"); const q=(text||input?.value||"").trim(); if(!q)return; addMsg(esc(q),"user"); if(input)input.value=""; setTimeout(()=>addMsg(respond(q),"bot"),80)}
-  function init(){const panel=$("nkustAiPanel"),btn=$("nkustAiButton"),close=$("nkustAiClose"),sendBtn=$("nkustAiSend"),input=$("nkustAiInput"),chips=$("nkustAiChips"),welcome=$("nkustAiWelcome"),sub=$("nkustAiSubtitle"); if(!panel||!btn)return; if(sub)sub.textContent=(PLATFORM==="QS"?"QS Sustainability Rankings":"THE Impact Rankings")+"｜依目前頁面資料回答，不使用外部 AI API"; if(welcome)welcome.innerHTML=`您好！我是 <b>NKUST 排名小助理</b>。我可以協助查詢 ${PLATFORM} 排名、分析高科大趨勢、列出台灣 Top 15、比較學校，以及找出各指標表現最佳的大學。<div class="nkust-ai-mini">所有數據都直接來自目前網頁載入的資料；若資料不存在，我會直接說明。</div>`; if(chips)chips.innerHTML=QUICK.map(q=>`<button type="button" class="nkust-ai-chip">${esc(q)}</button>`).join(""); btn.addEventListener("click",()=>panel.classList.toggle("open")); close?.addEventListener("click",()=>panel.classList.remove("open")); sendBtn?.addEventListener("click",()=>send()); input?.addEventListener("keydown",e=>{if(e.key==="Enter")send()}); chips?.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>send(b.textContent)))}
-  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+  function parseYear(q){const m=String(q).match(/20\d{2}/); return m?Number(m[0]):latestYear();}
+  function parseN(q, fallback=15){ const s=String(q); const m=s.match(/(?:top|前|前面|列出|顯示)\s*(\d{1,2})/i)||s.match(/(\d{1,2})\s*(?:名|所)/); if(m){const x=Number(m[1]); if(x>0&&x<=50)return x;} if(/前十/.test(s))return 10; if(/前十五/.test(s))return 15; return fallback; }
+  function metric(q){
+    const s=String(q); const sdg=s.match(/SDG\s*(1[0-7]|[1-9])/i)||s.match(/永續目標\s*(1[0-7]|[1-9])/i); if(sdg) return `SDG${Number(sdg[1])}`;
+    if(PLATFORM==="QS"){ for(const [k,v] of Object.entries(QS_METRIC_ALIASES)) if(norm(s).toLowerCase().includes(norm(k).toLowerCase())) return v; }
+    if(/overall|整體|總體|總分/.test(s)) return "Overall"; return null;
+  }
+  function row(s,y){return byYear(y).find(r=>r["學校"]===s)||null;}
+  function rowsOf(s){return data().records.filter(r=>r["學校"]===s).sort((a,b)=>num(a["年度"])-num(b["年度"]));}
+  function ranked(year, m){ const rows=byYear(year).filter(r=>r["學校"]); if(m&&m!=="Overall") return rows.filter(r=>score(r,m)!==null).sort((a,b)=>score(b,m)-score(a,m)); return rows.filter(r=>twRank(r)!==null||rankLow(r)!==null).sort((a,b)=>(twRank(a)??9999)-(twRank(b)??9999)||(rankLow(a)??99999)-(rankLow(b)??99999)); }
+  function line(r,m){ if(!r)return"無資料"; if(m&&m!=="Overall") return `${r["年度"]}｜${r["學校"]}｜${m}：${fmt(score(r,m))}｜臺灣排名：${val(r["臺灣排名"])}`; return `${r["年度"]}｜${r["學校"]}｜世界排名：${rank(r["排名"])}｜臺灣排名：${val(r["臺灣排名"])}｜Overall：${val(r["Overall"])}`; }
+  function help(){ return `我可以依目前${PLATFORM}頁面資料回答：\n\n• 單校查詢：高科大2026排名、北科表現如何\n• 趨勢分析：高科大近五年排名、NKUST是否進步\n• Top N：2026台灣前15、SDG17前10、治理前10\n• 比較學校：比較高科大與北科、高科大和中山誰比較好\n• 強弱項：高科大強項、高科大弱項、哪個指標最低\n• 變化分析：哪些學校進步最多、退步最多、SDG17是否下降\n• Benchmark：哪些學校跟高科大接近、建議追趕誰\n\n目前版本以網站資料計算，不連接外部AI，因此不會猜測資料中沒有的原因。`; }
+  function ansSchool(q){ const y=parseYear(q), s=school(q)||TARGET, r=row(s,y); if(!r)return`目前${PLATFORM}資料中找不到「${esc(s)}」在 ${y} 年的紀錄。`; const m=metric(q); if(m&&m!=="Overall")return`${s} ${y} 年 ${PLATFORM} ${m} 表現：\n\n${line(r,m)}`; const mets=PLATFORM==="QS"?QS_METRICS:SDGS; const vals=mets.map(m=>({m,v:score(r,m)})).filter(x=>x.v!==null).sort((a,b)=>b.v-a.v); return `${s} ${y} 年 ${PLATFORM} 排名資料：\n\n${line(r,"Overall")}\n\n最高指標：${vals.slice(0,3).map(x=>`${x.m} ${fmt(x.v)}`).join("、")||"—"}`; }
+  function ansTrend(q){ const s=school(q)||TARGET, rs=rowsOf(s); if(!rs.length)return`目前資料中找不到「${esc(s)}」。`; const my=String(q).match(/近\s*(\d+)\s*年/), limit=my?Number(my[1]):(PLATFORM==="QS"?4:5), m=metric(q)||"Overall", sel=rs.slice(-limit); const lines=sel.map(r=>m!=="Overall"?`• ${r["年度"]}：${m} ${fmt(score(r,m))}；臺灣排名 ${val(r["臺灣排名"])}`:`• ${r["年度"]}：世界排名 ${rank(r["排名"])}；臺灣排名 ${val(r["臺灣排名"])}；Overall ${val(r["Overall"])}`); let comment=""; if(sel.length>=2){ const first=sel[0], last=sel[sel.length-1]; if(m!=="Overall"){const d=(score(last,m)??0)-(score(first,m)??0); comment=d>0?`\n\n整體判讀：${m} 較起始年度上升 ${fmt(d)} 分。`:d<0?`\n\n整體判讀：${m} 較起始年度下降 ${fmt(Math.abs(d))} 分。`:`\n\n整體判讀：${m} 與起始年度大致持平。`;} else {const d=(twRank(first)??999)-(twRank(last)??999); comment=d>0?`\n\n整體判讀：臺灣排名較起始年度前進 ${d} 名。`:d<0?`\n\n整體判讀：臺灣排名較起始年度後退 ${Math.abs(d)} 名。`:`\n\n整體判讀：臺灣排名與起始年度相同或同區間。`;}} return `${s} 近 ${sel.length} 年 ${PLATFORM}${m!=="Overall"?` ${m}`:""} 趨勢：\n\n${lines.join("\n")}${comment}`; }
+  function ansTop(q){ const y=parseYear(q), m=metric(q)||"Overall", c=parseN(q,15), rows=ranked(y,m).slice(0,c); if(!rows.length)return`${y} 年目前沒有可排序的 ${m} 資料。`; const lines=rows.map((r,i)=>`${i+1}. ${r["學校"]}｜${m==="Overall"?`臺灣排名 ${val(r["臺灣排名"])}｜世界排名 ${rank(r["排名"])}｜Overall ${val(r["Overall"])}`:`${m} ${fmt(score(r,m))}｜臺灣排名 ${val(r["臺灣排名"])}`}`); return `${y} ${PLATFORM} ${m==="Overall"?`臺灣前 ${c} 名`:`${m} 前 ${c} 名`}：\n\n${lines.join("\n")}`; }
+  function ansBestWorst(q,worst=false){ const y=parseYear(q), m=metric(q)||(PLATFORM==="QS"?"治理":"SDG17"), rows=ranked(y,m); if(!rows.length)return`${y} 年沒有 ${m} 的可比較資料。`; const sel=worst?[...rows].reverse().slice(0,10):rows.slice(0,10); return `${y} 年 ${PLATFORM} ${m} ${worst?"較低":"最佳"}學校：\n\n`+sel.map((r,i)=>`${i+1}. ${r["學校"]}｜${m} ${fmt(score(r,m))}｜臺灣排名 ${val(r["臺灣排名"])}`).join("\n"); }
+  function ansCompare(q){ let ss=schoolsIn(q); if(ss.length<2)return`請輸入兩所學校，例如「比較高科大與北科」。`; ss=ss.slice(0,4); const y=parseYear(q), m=metric(q)||"Overall", rows=ss.map(s=>row(s,y)).filter(Boolean); if(!rows.length)return`${y} 年找不到這些學校的資料。`; const lines=rows.map(r=>`• ${r["學校"]}：${m==="Overall"?`世界排名 ${rank(r["排名"])}；臺灣排名 ${val(r["臺灣排名"])}；Overall ${val(r["Overall"])}`:`${m} ${fmt(score(r,m))}；臺灣排名 ${val(r["臺灣排名"])}`}`); const sorted=[...rows].sort((a,b)=>m==="Overall"?((twRank(a)??9999)-(twRank(b)??9999)||(rankLow(a)??99999)-(rankLow(b)??99999)):(score(b,m)??-999)-(score(a,m)??-999)); return `${y} 年 ${PLATFORM} 比較結果：\n\n${lines.join("\n")}\n\n判讀：以${m==="Overall"?"臺灣排名與世界排名":"該指標分數"}來看，${sorted[0]["學校"]}目前較前。`; }
+  function ansAnalyze(q){ const s=school(q)||TARGET, y=parseYear(q), r=row(s,y); if(!r)return`目前找不到 ${s} ${y} 年資料。`; const mets=PLATFORM==="QS"?QS_METRICS:SDGS, vals=mets.map(m=>({m,v:score(r,m)})).filter(x=>x.v!==null).sort((a,b)=>b.v-a.v); const top=vals.slice(0,3).map(x=>`${x.m} ${fmt(x.v)}`).join("、")||"—", weak=vals.slice(-3).reverse().map(x=>`${x.m} ${fmt(x.v)}`).join("、")||"—"; const prev=row(s,previousYear()); let change=""; if(prev&&previousYear()!==y){const d=(twRank(prev)??999)-(twRank(r)??999); change=d>0?`較 ${previousYear()} 年前進 ${d} 名`:d<0?`較 ${previousYear()} 年後退 ${Math.abs(d)} 名`:`與 ${previousYear()} 年臺灣排名相同或同區間`;} return `${s} ${y} 年 ${PLATFORM} 分析：\n\n• 世界排名：${rank(r["排名"])}\n• 臺灣排名：${val(r["臺灣排名"])}\n• Overall：${val(r["Overall"])}\n${change?`• 年度變化：${change}\n`:""}\n強項：${top}\n弱項：${weak}\n\n建議：可優先檢視弱項指標，同時以臺灣排名略高且指標結構相近的學校作為 benchmark。`; }
+  function ansSW(q,weak=false){ const s=school(q)||TARGET, y=parseYear(q), r=row(s,y); if(!r)return`目前找不到 ${s} ${y} 年資料。`; const mets=PLATFORM==="QS"?QS_METRICS:SDGS; let vals=mets.map(m=>({m,v:score(r,m)})).filter(x=>x.v!==null).sort((a,b)=>b.v-a.v); if(weak) vals=vals.reverse(); return `${s} ${y} 年 ${PLATFORM} ${weak?"相對弱項":"主要強項"}：\n\n`+vals.slice(0,6).map((x,i)=>`${i+1}. ${x.m}：${fmt(x.v)}`).join("\n")+`\n\n說明：此為依目前頁面資料中有分數的指標排序，未列入空白指標。`; }
+  function ansChange(q,decline=false){ const m=metric(q)||"Overall", ys=years(); if(ys.length<2)return"目前資料年度不足，無法計算變化。"; const y1=ys[ys.length-2], y2=ys[ys.length-1], changes=[]; for(const s of schoolNames()){const a=row(s,y1), b=row(s,y2); if(!a||!b)continue; let d=m==="Overall"?(twRank(a)??9999)-(twRank(b)??9999):(score(b,m)??null)-(score(a,m)??null); if(d===null||!Number.isFinite(d))continue; changes.push({s,a,b,d});} changes.sort((x,y)=>decline?x.d-y.d:y.d-x.d); const sel=changes.slice(0,10); if(!sel.length)return`無法計算 ${y1}–${y2} 的 ${m} 變化。`; const lines=sel.map((x,i)=>m==="Overall"?`${i+1}. ${x.s}｜${y1} 臺灣排名 ${val(x.a["臺灣排名"])} → ${y2} ${val(x.b["臺灣排名"])}｜${x.d>0?"前進":"後退"} ${Math.abs(x.d)} 名`:`${i+1}. ${x.s}｜${y1} ${fmt(score(x.a,m))} → ${y2} ${fmt(score(x.b,m))}｜${x.d>=0?"+":""}${fmt(x.d)}`); return `${PLATFORM} ${y1}–${y2} ${m} ${decline?"下降／退步最多":"進步最多"}：\n\n${lines.join("\n")}`; }
+  function ansSimilar(q){ const s=school(q)||TARGET, y=parseYear(q), base=row(s,y); if(!base)return`目前找不到 ${s} ${y} 年資料。`; const mets=PLATFORM==="QS"?QS_METRICS:SDGS, scored=[]; for(const r of byYear(y).filter(r=>r["學校"]!==s)){let dist=0,c=0; const a=twRank(base), b=twRank(r); if(a!==null&&b!==null){dist+=Math.abs(a-b)*2;c++;} for(const m of mets){const va=score(base,m), vb=score(r,m); if(va!==null&&vb!==null){dist+=Math.abs(va-vb);c++;}} if(c>0)scored.push({r,dist:dist/c});} scored.sort((a,b)=>a.dist-b.dist); return `${y} 年與 ${s} 表現輪廓較接近的學校：\n\n`+scored.slice(0,8).map((x,i)=>`${i+1}. ${x.r["學校"]}｜臺灣排名 ${val(x.r["臺灣排名"])}｜世界排名 ${rank(x.r["排名"])}｜相似距離 ${fmt(x.dist)}`).join("\n")+`\n\n說明：依臺灣排名與共同指標分數的距離估算，數值越低代表越接近。`; }
+  function ansBenchmark(q){ const s=school(q)||TARGET, y=parseYear(q), base=row(s,y); if(!base)return`目前找不到 ${s} ${y} 年資料。`; const b=twRank(base)??9999; const cs=byYear(y).filter(r=>r["學校"]!==s&&(twRank(r)??9999)<b).sort((a,b)=>(twRank(b)??0)-(twRank(a)??0)).slice(0,8); return `${s} ${y} 年可參考的 benchmark 學校：\n\n`+(cs.map((r,i)=>`${i+1}. ${r["學校"]}｜臺灣排名 ${val(r["臺灣排名"])}｜世界排名 ${rank(r["排名"])}｜Overall ${val(r["Overall"])}`).join("\n")||"目前沒有排名較前且可比較的學校。")+`\n\n建議優先選擇排名略高、指標結構相近、且在弱項指標較強的學校。`; }
+  function ansWhy(q){ const s=school(q)||TARGET, ys=years(); if(ys.length<2)return"目前資料年度不足，無法比較原因。"; const y1=ys[ys.length-2], y2=ys[ys.length-1], a=row(s,y1), b=row(s,y2); if(!a||!b)return`目前找不到 ${s} ${y1} 與 ${y2} 的完整資料。`; const mets=PLATFORM==="QS"?QS_METRICS:SDGS; const del=mets.map(m=>({m,a:score(a,m),b:score(b,m)})).filter(x=>x.a!==null&&x.b!==null).map(x=>({...x,d:x.b-x.a})).sort((x,y)=>x.d-y.d); const down=del.filter(x=>x.d<0).slice(0,5).map(x=>`${x.m}：${fmt(x.a)} → ${fmt(x.b)}（${fmt(x.d)}）`).join("\n")||"沒有共同指標下降。"; const up=del.filter(x=>x.d>0).sort((x,y)=>y.d-x.d).slice(0,5).map(x=>`${x.m}：${fmt(x.a)} → ${fmt(x.b)}（+${fmt(x.d)}）`).join("\n")||"沒有共同指標上升。"; return `${s} ${y1}–${y2} 變化檢視：\n\n排名：${rank(a["排名"])} / 臺灣 ${val(a["臺灣排名"])} → ${rank(b["排名"])} / 臺灣 ${val(b["臺灣排名"])}\n\n下降較明顯的共同指標：\n${down}\n\n上升較明顯的共同指標：\n${up}\n\n注意：目前資料只能指出分數與排名變化，不能直接判定真正原因；原因仍需回到提交資料、方法學與各校相對表現檢查。`; }
+  function kind(q){ const s=norm(q).toLowerCase(); if(!s||/可以問|怎麼問|help|說明|功能|你會/.test(s))return"help"; if(/為什麼|原因|怎麼會|下降原因|退步原因/.test(s))return"why"; if(/比較|相比|vs|跟|和|誰比較|哪個比較/.test(s)&&schoolsIn(q).length>=2)return"compare"; if(/benchmark|標竿|追趕|參考學校|對標/.test(s))return"benchmark"; if(/相近|接近|差不多|類似|同級/.test(s))return"similar"; if(/強項|優勢|最好|最高/.test(s)&&school(q))return"strength"; if(/弱項|劣勢|最低|改善|不足|需要加強/.test(s)&&school(q))return"weakness"; if(/分析|表現如何|怎麼樣|概況|summary|overview/.test(s)&&(school(q)||/高科|nkust/i.test(q)))return"analyze"; if(/趨勢|近\s*\d*\s*年|歷年|變化|是否進步|有沒有進步/.test(s)&&school(q))return"trend"; if(/退步最多|下降最多|掉最多|降幅最大/.test(s))return"decline"; if(/進步最多|上升最多|提升最多|前進最多/.test(s))return"improve"; if(/最低|最弱|較低/.test(s)&&metric(q))return"worst"; if(/最佳|最高|最好的是誰|第一/.test(s)&&metric(q))return"best"; if(/前\s*\d+|top\s*\d+|前十|前十五|排名前|排行榜|最佳學校|最好的是誰/.test(s))return"top"; if(school(q))return"school"; if(metric(q))return"top"; return"help"; }
+  function answer(q){ if(!ready())return"資料仍在載入中，請稍候幾秒後再試一次。"; try{switch(kind(q)){case"help":return help();case"why":return ansWhy(q);case"compare":return ansCompare(q);case"benchmark":return ansBenchmark(q);case"similar":return ansSimilar(q);case"strength":return ansSW(q,false);case"weakness":return ansSW(q,true);case"analyze":return ansAnalyze(q);case"trend":return ansTrend(q);case"decline":return ansChange(q,true);case"improve":return ansChange(q,false);case"worst":return ansBestWorst(q,true);case"best":return ansBestWorst(q,false);case"top":return ansTop(q);case"school":return /近\s*\d*\s*年|歷年|趨勢/.test(q)?ansTrend(q):ansSchool(q);default:return help();}}catch(e){console.error(e);return"我剛剛解析問題時發生錯誤。請換一種問法，例如「高科大2026排名」、「比較高科大與北科」、「SDG17前10」。";} }
+  function addMsg(text,who="bot"){const body=$("nkustAiBody"); if(!body)return; const div=document.createElement("div"); div.className=`nkust-ai-msg ${who}`; div.textContent=text; body.appendChild(div); body.scrollTop=body.scrollHeight;}
+  function ask(q){if(!q.trim())return; addMsg(q,"user"); setTimeout(()=>addMsg(answer(q),"bot"),60);}
+  function init(){ const btn=$("nkustAiButton"),panel=$("nkustAiPanel"),close=$("nkustAiClose"),input=$("nkustAiInput"),send=$("nkustAiSend"),chips=$("nkustAiChips"),welcome=$("nkustAiWelcome"),sub=$("nkustAiSubtitle"); if(!btn||!panel||!input||!send)return; if(sub)sub.textContent=`${PLATFORM} Ranking Engine｜依目前頁面資料計算`; if(welcome)welcome.textContent=`您好，我是 NKUST 排名小助理。\n\n我現在有新的 Ranking Engine，可以解析更多問法，例如：\n• 高科大今年排名如何？\n• 比較高科大與北科\n• ${PLATFORM==="THE"?"SDG17前10、SDG17為什麼下降":"治理前10、環境研究最佳學校"}\n• 高科大弱項與benchmark\n• 哪些學校進步最多`; if(chips){chips.innerHTML=""; QUICK.forEach(q=>{const b=document.createElement("button"); b.type="button"; b.className="nkust-ai-chip"; b.textContent=q; b.addEventListener("click",()=>ask(q)); chips.appendChild(b);});} btn.addEventListener("click",()=>panel.classList.toggle("open")); close&&close.addEventListener("click",()=>panel.classList.remove("open")); send.addEventListener("click",()=>{const q=input.value; input.value=""; ask(q); input.focus();}); input.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault(); send.click();}}); }
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init); else init();
 })();
 </script>
+
 
 </body>
 </html>
